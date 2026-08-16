@@ -362,8 +362,11 @@
   var wallVideo = $('#wallvideo');
   var viewBtn = $('#viewtoggle');
   var view = 'surface';
+  var reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function setView(v, persist) {
+  /* the raw swap — instant, no ceremony. Init, error fallback and
+     reduced-motion all come straight here. */
+  function applyView(v, persist) {
     if (v !== 'space' && v !== 'surface') return false;
     view = v;
     var space = v === 'space';
@@ -380,9 +383,90 @@
     return true;
   }
 
+  /* ---- the warp jump ------------------------------------------------------
+     The space video opens on star streaks blasting past the planet; the
+     toggle borrows that grammar. Radial streaks accelerate out of the centre
+     and black out the desktop, the view swaps under the cover at the
+     midpoint, then the streaks decelerate and clear. Overlay only spans
+     #desktop, so the taskbar stays put — the OS never warps, just the sky. */
+  var warpCv = document.createElement('canvas');
+  warpCv.id = 'warp';
+  desktop.appendChild(warpCv);
+  var warping = false;
+
+  function setView(v, persist) {
+    if (v !== 'space' && v !== 'surface') return false;
+    if (v === view) return true;
+    if (warping) return false;
+    if (reduceMotion) return applyView(v, persist);
+
+    warping = true;
+    var ctx = warpCv.getContext('2d');
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = warpCv.width = Math.round(desktop.clientWidth * dpr);
+    var H = warpCv.height = Math.round(desktop.clientHeight * dpr);
+    warpCv.style.display = 'block';
+
+    var cx = W / 2, cy = H * 0.46;
+    var R = Math.hypot(W, H) * 0.62;
+    var N = 220, streaks = [], i;
+    for (i = 0; i < N; i++) {
+      streaks.push({
+        a: Math.random() * 6.283,        /* bearing from centre */
+        d: Math.random(),                /* radial position, 0..1 */
+        v: 0.55 + Math.random() * 1.45   /* individual speed */
+      });
+    }
+
+    var DUR = 900, t0 = performance.now(), last = t0, swapped = false;
+    (function frame(now) {
+      var t = Math.min(1, (now - t0) / DUR);
+      var dt = Math.min(64, now - last); last = now;
+      var env = Math.sin(Math.PI * t);   /* intensity: 0 → 1 → 0 */
+
+      /* swap under full cover */
+      if (t >= 0.5 && !swapped) { swapped = true; applyView(v, persist); }
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(5,3,1,' + (env * 0.94).toFixed(3) + ')';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.lineCap = 'round';
+      for (i = 0; i < N; i++) {
+        var s = streaks[i];
+        s.d += dt * 0.001 * s.v * (0.25 + env * 2.1);
+        if (s.d >= 1) s.d -= 1;
+        /* quadratic radius: streaks pick up speed as they fly outward */
+        var r0 = s.d * s.d * R;
+        var r1 = Math.min(R, r0 + (0.025 + 0.14 * env * s.v) * R * s.d);
+        var ca = Math.cos(s.a), sa = Math.sin(s.a);
+        var alpha = env * (0.2 + 0.8 * s.d);
+
+        ctx.strokeStyle = 'rgba(255,200,61,' + (alpha * 0.35).toFixed(3) + ')';
+        ctx.lineWidth = 3 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(cx + ca * r0, cy + sa * r0);
+        ctx.lineTo(cx + ca * r1, cy + sa * r1);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255,246,216,' + alpha.toFixed(3) + ')';
+        ctx.lineWidth = 1.2 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(cx + ca * r0, cy + sa * r0);
+        ctx.lineTo(cx + ca * r1, cy + sa * r1);
+        ctx.stroke();
+      }
+
+      if (t < 1) { requestAnimationFrame(frame); return; }
+      warpCv.style.display = 'none';
+      warping = false;
+    })(t0);
+    return true;
+  }
+
   /* if the video is missing or unplayable, fall back and retire the button */
   wallVideo.addEventListener('error', function () {
-    setView('surface', false);
+    applyView('surface', false);
     viewBtn.disabled = true;
     viewBtn.textContent = '▲ SURFACE';
   });
@@ -391,8 +475,8 @@
     setView(view === 'space' ? 'surface' : 'space', true);
   });
 
-  try { setView(localStorage.getItem('venus-view') || 'surface', false); }
-  catch (e) { setView('surface', false); }
+  try { applyView(localStorage.getItem('venus-view') || 'surface', false); }
+  catch (e) { applyView('surface', false); }
 
   window.VENUSOS = { open: openApp, close: closeWin, apps: APPS, setView: setView };
 })();

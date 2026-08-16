@@ -100,6 +100,12 @@ body {
 body.space-view #wallvideo { display: block; }
 body.space-view #wallpaper { display: none; }
 body.space-view #desktop::before { display: none; }   /* no cloud wash in orbit */
+
+/* the warp-jump overlay — visual only, spans the desktop, never the taskbar */
+#warp {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: 5000; display: none; pointer-events: none;
+}
 /* Cloud bands over the terrain. Tactical-OS drew hard venetian bars over its
    desktop; here the Magellan plate underneath has to stay readable, so the
    same device is dialled down to a scanline haze plus a thin warm wash. */

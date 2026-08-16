@@ -89,6 +89,17 @@ body {
   background: var(--void);
 }
 #wallpaper { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+
+/* SPACE view: the hero video replaces the surface canvas wholesale. The
+   canvas render loops check their own visibility, so hiding them here is
+   also what pauses them. */
+#wallvideo {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: none; z-index: 0; background: #050301;
+}
+body.space-view #wallvideo { display: block; }
+body.space-view #wallpaper { display: none; }
+body.space-view #desktop::before { display: none; }   /* no cloud wash in orbit */
 /* Cloud bands over the terrain. Tactical-OS drew hard venetian bars over its
    desktop; here the Magellan plate underneath has to stay readable, so the
    same device is dialled down to a scanline haze plus a thin warm wash. */
@@ -215,6 +226,17 @@ body.wm-drag iframe, body.wm-drag canvas { pointer-events: none; }
   border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh);
   background: var(--line); color: var(--gold);
 }
+
+#viewtoggle {
+  flex: none; height: 26px; padding: 0 11px; cursor: pointer;
+  font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .14em;
+  color: var(--sulfur); background: var(--panel-2);
+  border: 2px solid; border-color: var(--bevel-hi) var(--bevel-sh) var(--bevel-sh) var(--bevel-hi);
+}
+#viewtoggle:hover { color: var(--gold); }
+#viewtoggle:active,
+#viewtoggle[aria-pressed="true"] { border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh); }
+#viewtoggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
 #tray {
   flex: none; display: flex; align-items: center; gap: 10px; height: 26px; padding: 0 10px;

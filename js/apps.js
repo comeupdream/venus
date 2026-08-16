@@ -260,6 +260,7 @@ window.VENUSAPPS = (function () {
           say('  phase      current Venus phase, computed live');
           say('  venus      physical data sheet');
           say('  open X     launch an app (globe, phase, clouds, coin, refs)');
+          say('  view X     switch the desktop: view surface | view space');
           say('  seed       reseed the wallpaper terrain');
           say('  credits    where every visual cue came from');
           say('  clear      clear this buffer');
@@ -286,6 +287,13 @@ window.VENUSAPPS = (function () {
           if (!window.VENUSOS.apps[a]) return say('<span class="e">  no such app: ' + a + '</span>');
           window.VENUSOS.open(a);
           say('  launching ' + a + '…');
+        },
+        view: function (a) {
+          if (a !== 'surface' && a !== 'space') {
+            return say('<span class="e">  usage: view surface | view space</span>');
+          }
+          window.VENUSOS.setView(a, true);
+          say('  switching to ' + a.toUpperCase() + ' view…');
         },
         seed: function () {
           say('  reseeding terrain…');

@@ -37,6 +37,8 @@
      ======================================================================= -->
 <div id="desktop">
   <canvas id="wallpaper" aria-hidden="true"></canvas>
+  <video id="wallvideo" data-src="assets/hero-space.mp4" muted loop playsinline
+         preload="metadata" aria-hidden="true"></video>
 </div>
 
 <!-- ==========================================================================
@@ -47,6 +49,7 @@
     <span aria-hidden="true">☉</span> START
   </button>
   <div id="tasks" role="list"></div>
+  <button id="viewtoggle" title="Toggle surface / space view" aria-pressed="false">▲ SURFACE</button>
   <div id="tray">
     <span class="phase" id="trayphase">☾ —</span>
     <span class="clock" id="clock">--:--</span>

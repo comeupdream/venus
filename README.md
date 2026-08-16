@@ -21,18 +21,19 @@ Every visual cue is ported working code, not a mood board:
 | `INFINITEPARALLEL` | The CAD wireframe kernel (`rig.js`/`rifle.js`): projection, field-strip explode, hover callouts; plus the Blue & Gold palette | `js/venus-globe.js` — rifle parts became planetary shells |
 | NASA/JPL Magellan | `PIA00107`, the 3-D perspective view of Sapas Mons | `js/terrain.js` generates it procedurally |
 
-## The hero terrain photo
+## The hero assets
 
-`js/terrain.js` renders the wallpaper procedurally by default. To use the real
-Magellan plate instead, drop it at:
+Two views, toggled from the taskbar (or `view surface` / `view space` in VDOS):
 
-```
-assets/hero-terrain.jpg
-```
+- **SURFACE** — the Magellan plate at `assets/hero-terrain.webp` (`.jpg` and
+  `.png` are probed too). Its horizon is auto-detected and pinned to the 75%
+  line, so the land fills the bottom quarter of the screen and a procedural
+  starfield drifts and twinkles in the black above it. If no plate is present,
+  `js/terrain.js` generates the terrain instead — same composition, same stars.
+- **SPACE** — the orbit video at `assets/hero-space.mp4`, lazy-loaded on first
+  toggle so surface visitors never download it.
 
-Nothing else to change — the wallpaper probes for that path on load and the
-photograph takes over automatically (the tray still says which mode you're in).
-PIA00107 is NASA/JPL, public domain; keep the credit in SOURCES.
+The Magellan imagery is NASA/JPL, public domain; keep the credit in SOURCES.
 
 ## The design rules
 

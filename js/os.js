@@ -354,5 +354,45 @@
     });
   }
 
-  window.VENUSOS = { open: openApp, close: closeWin, apps: APPS };
+  /* =========================================================================
+   * VIEW TOGGLE — SURFACE (terrain wallpaper) <-> SPACE (the hero video).
+   * The video's src is only attached on first use, so surface-only visitors
+   * never download it. Choice persists.
+   * =======================================================================*/
+  var wallVideo = $('#wallvideo');
+  var viewBtn = $('#viewtoggle');
+  var view = 'surface';
+
+  function setView(v, persist) {
+    if (v !== 'space' && v !== 'surface') return false;
+    view = v;
+    var space = v === 'space';
+    document.body.classList.toggle('space-view', space);
+    if (space) {
+      if (!wallVideo.src) wallVideo.src = wallVideo.dataset.src;
+      wallVideo.play().catch(function () { /* not fatal — poster frame shows */ });
+    } else {
+      wallVideo.pause();
+    }
+    viewBtn.textContent = space ? '⬤ SPACE' : '▲ SURFACE';
+    viewBtn.setAttribute('aria-pressed', space ? 'true' : 'false');
+    if (persist) { try { localStorage.setItem('venus-view', v); } catch (e) { /* private mode */ } }
+    return true;
+  }
+
+  /* if the video is missing or unplayable, fall back and retire the button */
+  wallVideo.addEventListener('error', function () {
+    setView('surface', false);
+    viewBtn.disabled = true;
+    viewBtn.textContent = '▲ SURFACE';
+  });
+
+  viewBtn.addEventListener('click', function () {
+    setView(view === 'space' ? 'surface' : 'space', true);
+  });
+
+  try { setView(localStorage.getItem('venus-view') || 'surface', false); }
+  catch (e) { setView('surface', false); }
+
+  window.VENUSOS = { open: openApp, close: closeWin, apps: APPS, setView: setView };
 })();

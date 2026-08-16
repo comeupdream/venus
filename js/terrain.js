@@ -166,6 +166,7 @@ window.TERRAIN = (function () {
   /* ---- the scanline projector -------------------------------------------- */
   function Renderer(canvas) {
     var ctx = canvas.getContext('2d', { alpha: false });
+    var stars = Starfield(0x5EED, 110);
     var iw = 0, ih = 0, img = null, buf = null, data = null;
     /* Start the camera northwest of the Sapas dome (map y 0.62) looking at it,
        the way PIA00107 was framed, then drift slowly in. */
@@ -175,7 +176,9 @@ window.TERRAIN = (function () {
     /* All of these are in MAP CELLS, including the vertical ones — the
        heightmap is normalised 0..1, so it is multiplied by VEXAG into the same
        space as the horizontal sampling or the planet comes out flat. */
-    var HORIZON = 0.34;      /* fraction of the frame that is sky */
+    var HORIZON = 0.75;      /* fraction of the frame that is sky — matches
+                                HORIZON_FRAC so both modes share the same
+                                bottom-quarter land composition */
     var RELIEF = VEXAG;      /* map cells from datum to highest peak */
     var CAM_H = 12.5;        /* camera altitude above datum */
     var DEPTH = 190;         /* furthest z drawn, in map cells */
@@ -268,6 +271,10 @@ window.TERRAIN = (function () {
         dz *= 1.014;                         /* coarser far away — cheap LOD */
       }
 
+      /* stars into the sky, occluded by the terrain y-buffer */
+      stars.update(dt);
+      stars.plot(data, iw, ih, buf, !reduce);
+
       ctx.putImageData(img, 0, 0);
     }
 
@@ -279,34 +286,177 @@ window.TERRAIN = (function () {
     return { resize: resize, frame: frame, look: look };
   }
 
+  /* ---- starfield ----------------------------------------------------------
+     Lives in the black 75% above the horizon, in both wallpaper modes. Same
+     seeded-noise discipline as everything else: deterministic positions, slow
+     drift (near stars drift faster), sinusoidal twinkle, and a haze fade
+     toward the horizon — Venus's atmosphere would eat the low stars first. */
+  function Starfield(seed, count) {
+    var rnd = mulberry32(seed);
+    var stars = [];
+    for (var i = 0; i < count; i++) {
+      stars.push({
+        x: rnd(), y: rnd(),               /* fractions of the sky region */
+        z: 0.3 + rnd() * 0.7,             /* depth → brightness and speed */
+        tw: rnd() * 6.283,                /* twinkle phase */
+        ts: 0.3 + rnd() * 1.0             /* twinkle rate, Hz-ish */
+      });
+    }
+    var t = 0;
+    return {
+      update: function (dt) {
+        t += dt * 0.001;
+        for (var i = 0; i < stars.length; i++) {
+          var s = stars[i];
+          s.x += dt * 0.0000042 * s.z;    /* a full crossing takes ~an hour */
+          if (s.x >= 1) s.x -= 1;
+        }
+      },
+      /** hi-res pass (photo mode): paint into a 2D context, sky = 0..skyPx */
+      paint: function (ctx, W, skyPx, twinkle) {
+        for (var i = 0; i < stars.length; i++) {
+          var s = stars[i];
+          var a = s.z * (twinkle ? (0.55 + 0.45 * Math.sin(t * s.ts * 6.283 + s.tw)) : 0.8);
+          a *= 0.35 + 0.65 * (1 - s.y);   /* haze: dimmer near the horizon */
+          if (a <= 0.05) continue;
+          var r = s.z > 0.85 ? 2 : 1;
+          ctx.globalAlpha = Math.min(1, a);
+          ctx.fillStyle = s.z > 0.92 ? '#fff6d8' : '#e8e2d2';
+          ctx.fillRect(s.x * W, s.y * skyPx, r, r);
+        }
+        ctx.globalAlpha = 1;
+      },
+      /** low-res pass (procedural mode): blend into the ImageData, occluded by
+       *  the terrain y-buffer so ridges block stars like ridges should */
+      plot: function (data, iw, ih, buf, twinkle) {
+        for (var i = 0; i < stars.length; i++) {
+          var s = stars[i];
+          var px = (s.x * iw) | 0;
+          var py = (s.y * ih * 0.72) | 0;
+          if (px < 0 || px >= iw || py >= buf[px]) continue;
+          var a = s.z * (twinkle ? (0.55 + 0.45 * Math.sin(t * s.ts * 6.283 + s.tw)) : 0.8);
+          a *= 0.35 + 0.65 * (1 - s.y);
+          if (a <= 0.05) continue;
+          var o = (py * iw + px) * 4;
+          data[o]     += (232 - data[o]) * a;
+          data[o + 1] += (226 - data[o + 1]) * a;
+          data[o + 2] += (210 - data[o + 2]) * a;
+        }
+      }
+    };
+  }
+
   /* ---- public: mount onto a canvas, or defer to the real photograph ------- */
+
+  /* Composition contract, shared by both modes: the land occupies the bottom
+     quarter of the viewport, everything above the horizon is black sky. */
+  var HORIZON_FRAC = 0.75;
+
   function mount(canvas, opts) {
     opts = opts || {};
     var seed = opts.seed || 20260816;
-    var photo = opts.photo || 'assets/hero-terrain.jpg';
     var onMode = opts.onMode || function () {};
 
-    /* If the plate is present it wins — it is the real surface, after all. */
-    var probe = new Image();
-    probe.onload = function () { usePhoto(canvas, probe); onMode('photo'); };
-    probe.onerror = function () { useProcedural(canvas, seed); onMode('procedural'); };
-    probe.src = photo;
+    /* If a plate is present it wins — it is the real surface, after all.
+       Try the documented name in each format the user might drop. */
+    var candidates = opts.photo ? [opts.photo] :
+      ['assets/hero-terrain.jpg', 'assets/hero-terrain.webp', 'assets/hero-terrain.png'];
+    (function probeNext(i) {
+      if (i >= candidates.length) { useProcedural(canvas, seed); onMode('procedural'); return; }
+      var probe = new Image();
+      probe.onload = function () { usePhoto(canvas, probe); onMode('photo'); };
+      probe.onerror = function () { probeNext(i + 1); };
+      probe.src = candidates[i];
+    })(0);
+  }
+
+  /** Find where the terrain starts in the plate: scan a thumbnail top-down.
+   *  Two lines come back — `first`, the row where ANY terrain appears (the
+   *  peak tips), and `main`, the row where the ground truly begins (>30% of
+   *  the row lit). The image is drawn from `first` so no summit gets cropped;
+   *  `main` is what gets pinned to the 75% line. Detecting beats hardcoding —
+   *  whichever Magellan variant gets dropped in, the horizon lands exactly. */
+  function findHorizon(image) {
+    var sw = 64, shh = Math.max(16, Math.round(sw * image.height / image.width));
+    var c = document.createElement('canvas');
+    c.width = sw; c.height = shh;
+    var x = c.getContext('2d');
+    x.drawImage(image, 0, 0, sw, shh);
+    var first = -1, main = -1;
+    try {
+      var d = x.getImageData(0, 0, sw, shh).data;
+      for (var y = 0; y < shh && main < 0; y++) {
+        var lit = 0;
+        for (var i = 0; i < sw; i++) {
+          var o = (y * sw + i) * 4;
+          if (d[o] + d[o + 1] + d[o + 2] > 72) lit++;
+        }
+        if (lit > 2 && first < 0) first = y;
+        if (lit > sw * 0.3) main = y;
+      }
+    } catch (e) { /* tainted canvas (odd file:// setups) — fall through */ }
+    if (main < 0) { main = Math.round(shh * 0.12); }   /* PIA00107's fraction */
+    if (first < 0 || first > main) first = main;
+    return { first: first / shh, main: main / shh };
   }
 
   function usePhoto(canvas, image) {
     var ctx = canvas.getContext('2d', { alpha: false });
-    function paint() {
+    var hz = findHorizon(image);
+    var landFrac = Math.max(0.05, 1 - hz.main);
+    var stars = Starfield(0x5EED, 150);
+    var W = 0, H = 0;
+
+    function resize() {
       var w = canvas.clientWidth || window.innerWidth;
       var h = canvas.clientHeight || window.innerHeight;
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
-      var s = Math.max(canvas.width / image.width, canvas.height / image.height);
-      var dw = image.width * s, dh = image.height * s;
-      ctx.fillStyle = '#0a0702'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(image, (canvas.width - dw) / 2, (canvas.height - dh) * 0.62, dw, dh);
+      canvas.width = W = Math.round(w * dpr);
+      canvas.height = H = Math.round(h * dpr);
     }
-    paint();
-    addEventListener('resize', paint);
+
+    function draw(twinkle) {
+      /* sky first — the plate is drawn source-cropped at its first terrain
+         row, so the black above it is OURS and the stars live there. The
+         sliver between peak tips and the main horizon comes from the plate
+         and its black gaps occlude stars exactly like mountains should. */
+      ctx.fillStyle = '#050301';
+      ctx.fillRect(0, 0, W, H);
+      stars.paint(ctx, W, H * HORIZON_FRAC, twinkle);
+
+      /* Cover the width; if the plate is so wide its land would come up short
+         of the bottom quarter, scale up and crop the sides instead. The
+         plate's main horizon is pinned to the 75% line and the foreground
+         below the viewport is cropped away. */
+      var s = Math.max(
+        W / image.width,
+        ((1 - HORIZON_FRAC) * H) / (landFrac * image.height)
+      );
+      var sy = hz.first * image.height;
+      var dw = image.width * s;
+      var dx = (W - dw) / 2;
+      var dy = H * HORIZON_FRAC - (hz.main - hz.first) * image.height * s;
+      ctx.drawImage(image, 0, sy, image.width, image.height - sy,
+                    dx, dy, dw, (image.height - sy) * s);
+    }
+
+    resize();
+    if (reduce) {
+      draw(false);
+      addEventListener('resize', function () { resize(); draw(false); });
+      return;
+    }
+    addEventListener('resize', resize);
+    var last = performance.now(), acc = 0;
+    (function loop(now) {
+      requestAnimationFrame(loop);
+      var dt = Math.min(64, now - last); last = now; acc += dt;
+      if (acc < 33) return;
+      /* skip work when hidden — tab in background or SPACE view on top */
+      if (document.hidden || !canvas.offsetParent) { acc = 0; return; }
+      stars.update(acc); acc = 0;
+      draw(true);
+    })(last);
   }
 
   function useProcedural(canvas, seed) {
@@ -326,8 +476,9 @@ window.TERRAIN = (function () {
       requestAnimationFrame(loop);
       var dt = Math.min(64, now - last); last = now; acc += dt;
       if (acc < 33) return;
-      acc = 0;
-      if (!document.hidden) r.frame(dt);
+      /* skip work when hidden — tab in background or SPACE view on top */
+      if (document.hidden || !canvas.offsetParent) { acc = 0; return; }
+      r.frame(acc); acc = 0;
     })(last);
   }
 

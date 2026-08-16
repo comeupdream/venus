@@ -1,0 +1,267 @@
+/* =============================================================================
+ * os.css — VENUS-OS shell
+ *
+ * Structure ported from HOFFMAN-TACTICAL public/retro.css (Tactical-OS 96):
+ * boot screen -> desktop + icons -> draggable/resizable windows -> taskbar
+ * + start menu. Every grey is re-hued to brass; the bevel logic (2px border,
+ * hi/sh/sh/hi) is kept verbatim because that IS the look.
+ * ===========================================================================*/
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--text);
+  background: var(--night);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* chrome must never start a text selection or a touch scroll */
+.win .tbar, .win .grip, .win .rz, .dicon,
+#taskbar, #startbtn, #startmenu {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------- bevels (retro.css, re-hued) ---------- */
+.raised {
+  border: 2px solid;
+  border-color: var(--bevel-hi) var(--bevel-sh) var(--bevel-sh) var(--bevel-hi);
+  background: var(--panel);
+}
+.sunken {
+  border: 2px solid;
+  border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh);
+  background: var(--sunken);
+}
+
+/* =============================================================================
+ * BOOT — a POST screen. Ported shape from retro.css #boot, but the payload is
+ * a Venus atmospheric-entry log instead of a rifle.
+ * ===========================================================================*/
+#boot {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--void); color: var(--dim);
+  font-family: var(--mono); font-size: 14px;
+  padding: 28px; cursor: pointer; overflow: hidden;
+}
+#bootglobe { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .5; }
+#boot pre { margin: 0; white-space: pre-wrap; position: relative; z-index: 1; }
+#boot .cur { background: var(--gold); color: var(--void); }
+
+#bootos {
+  position: absolute; left: 0; right: 0; bottom: 8vh; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  pointer-events: none;
+}
+#bootos .logo {
+  font-family: var(--display); font-weight: 900; font-size: clamp(34px, 9vw, 58px);
+  letter-spacing: .16em; color: var(--gold-hi);
+  text-shadow: var(--drop), 0 0 34px rgba(255, 200, 61, .55);
+}
+#bootos .logo b { color: var(--ember); }
+#bootos .sub {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .34em;
+  color: var(--sulfur); text-shadow: 0 1px 3px #000;
+}
+#bootos .pbar {
+  width: min(380px, 80vw); height: 20px; padding: 2px;
+  background: var(--panel);
+  border: 2px solid; border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh);
+}
+#bootos .pbar i {
+  display: block; height: 100%; width: 0;
+  background: repeating-linear-gradient(90deg, var(--gold-deep) 0 14px, var(--gold) 14px 16px);
+  transition: width .12s linear;
+}
+#bootos .skip { font-family: var(--mono); font-size: 10px; color: var(--faint); letter-spacing: .2em; }
+
+/* =============================================================================
+ * DESKTOP — retro.css used venetian sunset bands for the orca poster.
+ * Here the same device draws Venus's banded cloud deck, drifting.
+ * ===========================================================================*/
+#desktop {
+  position: fixed; inset: 0 0 var(--taskbar-h) 0; overflow: hidden;
+  background: var(--void);
+}
+#wallpaper { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+/* Cloud bands over the terrain. Tactical-OS drew hard venetian bars over its
+   desktop; here the Magellan plate underneath has to stay readable, so the
+   same device is dialled down to a scanline haze plus a thin warm wash. */
+#desktop::before {
+  content: ""; position: absolute; inset: -20% -10%; z-index: 1; pointer-events: none;
+  background:
+    repeating-linear-gradient(174deg, transparent 0 3px, rgba(10, 7, 2, .16) 3px 6px),
+    linear-gradient(178deg,
+      rgba(244, 224, 77, .07)  0%,
+      rgba(255, 122, 47, .05) 52%,
+      rgba(184, 134, 42, .07) 100%);
+  animation: drift 120s linear infinite;
+}
+@keyframes drift { from { transform: translateY(0); } to { transform: translateY(6px); } }
+#desktop::after {                        /* vignette so icon labels stay legible */
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(10, 7, 2, .74) 0, transparent 240px),
+    radial-gradient(140% 130% at 72% 22%, transparent 46%, rgba(10, 7, 2, .72));
+}
+
+.dicon {
+  position: absolute; z-index: 3; width: 92px; text-align: center;
+  color: var(--text); cursor: pointer; padding: 6px 2px;
+  border: 1px dotted transparent; background: none;
+}
+.dicon:hover { background: rgba(255, 200, 61, .12); }
+.dicon.sel  { background: rgba(255, 200, 61, .22); border-color: var(--gold); }
+.dicon:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.dicon .gi  { font-size: 32px; line-height: 38px; filter: drop-shadow(1px 2px 0 rgba(0,0,0,.6)); }
+.dicon .lbl {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .06em; margin-top: 3px;
+  text-shadow: 1px 1px 0 #000, 0 0 8px rgba(0,0,0,.9); word-wrap: break-word;
+}
+
+/* =============================================================================
+ * WINDOWS
+ * ===========================================================================*/
+.win {
+  position: absolute; min-width: 260px; min-height: 140px;
+  display: flex; flex-direction: column;
+  background: var(--panel);
+  border: 2px solid; border-color: var(--bevel-hi) var(--bevel-sh) var(--bevel-sh) var(--bevel-hi);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, .55), 0 18px 50px rgba(0, 0, 0, .5);
+}
+.win.max { left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important; }
+
+.win .tbar {
+  display: flex; align-items: center; gap: 6px; flex: none;
+  height: var(--tbar-h); padding: 0 3px 0 6px; cursor: default;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+  color: var(--ink);
+}
+.win.blur .tbar { background: linear-gradient(90deg, #4a3517, #6a4f21); color: var(--dim); }
+.win .tbar .ti { font-size: 13px; }
+.win .tbar .tt {
+  flex: 1; font-weight: 800; font-size: 11.5px; letter-spacing: .1em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.win .tbar .tb {
+  width: 19px; height: 16px; display: grid; place-items: center; line-height: 1;
+  font-family: var(--mono); font-size: 11px; font-weight: 800; color: var(--text);
+  background: var(--panel-2); cursor: pointer;
+  border: 2px solid; border-color: var(--bevel-hi) var(--bevel-sh) var(--bevel-sh) var(--bevel-hi);
+}
+.win .tbar .tb:hover  { background: var(--line); }
+.win .tbar .tb:active { border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh); }
+
+.win .wbody {
+  flex: 1; margin: 3px; overflow: auto; position: relative;
+  background: var(--sunken);
+  border: 2px solid; border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh);
+}
+.win .wbody.plain { margin: 0; border: 0; background: var(--panel); }
+
+/* resize handles — retro.css used glowing red triangles; gold here */
+.win .grip, .win .rz {
+  position: absolute; z-index: 8; width: 20px; height: 20px; background: none;
+}
+.win .grip     { right: 0; bottom: 0; cursor: nwse-resize; }
+.win .rz.ne    { top: 0; right: 0; cursor: nesw-resize; }
+.win .rz.nw    { top: 0; left: 0;  cursor: nwse-resize; }
+.win .rz.sw    { bottom: 0; left: 0; cursor: nesw-resize; }
+.win .grip::after, .win .rz::after {
+  content: ""; position: absolute; width: 11px; height: 11px;
+  background: var(--gold); opacity: .5; filter: drop-shadow(0 0 3px var(--gold));
+}
+.win .grip::after  { right: 1px; bottom: 1px; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+.win .rz.ne::after { right: 1px; top: 1px;    clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.win .rz.nw::after { left: 1px;  top: 1px;    clip-path: polygon(0 0, 100% 0, 0 100%); }
+.win .rz.sw::after { left: 1px;  bottom: 1px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+
+body.wm-drag { cursor: grabbing; }
+body.wm-drag iframe, body.wm-drag canvas { pointer-events: none; }
+
+/* =============================================================================
+ * TASKBAR + START
+ * ===========================================================================*/
+#taskbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  height: var(--taskbar-h); display: flex; align-items: center; gap: 5px; padding: 3px 5px;
+  background: var(--panel);
+  border-top: 2px solid var(--bevel-hi);
+}
+#startbtn {
+  display: flex; align-items: center; gap: 6px; flex: none;
+  height: 26px; padding: 0 11px; cursor: pointer;
+  font-family: var(--sans); font-size: 11.5px; font-weight: 900; letter-spacing: .1em;
+  color: var(--ink); background: linear-gradient(180deg, var(--gold), var(--gold-deep));
+  border: 2px solid; border-color: var(--bevel-hi) var(--bevel-sh) var(--bevel-sh) var(--bevel-hi);
+}
+#startbtn.on, #startbtn:active { border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh); }
+
+#tasks { display: flex; gap: 4px; flex: 1; overflow: hidden; }
+#tasks .task {
+  max-width: 168px; height: 26px; padding: 0 10px; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--sans); font-size: 11px; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: var(--panel-2);
+  border: 2px solid; border-color: var(--bevel-hi) var(--bevel-sh) var(--bevel-sh) var(--bevel-hi);
+}
+#tasks .task.active {
+  border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh);
+  background: var(--line); color: var(--gold);
+}
+
+#tray {
+  flex: none; display: flex; align-items: center; gap: 10px; height: 26px; padding: 0 10px;
+  font-family: var(--mono); font-size: 11px; color: var(--dim);
+  border: 2px solid; border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh);
+}
+#tray .phase { color: var(--sulfur); }
+#tray .clock { color: var(--gold); letter-spacing: .08em; }
+
+#startmenu {
+  position: fixed; left: 5px; bottom: calc(var(--taskbar-h) + 3px); z-index: 600;
+  width: 250px; display: none; overflow: hidden;
+  background: var(--panel);
+  border: 2px solid; border-color: var(--bevel-hi) var(--bevel-sh) var(--bevel-sh) var(--bevel-hi);
+  box-shadow: 3px 3px 0 rgba(0,0,0,.55);
+}
+#startmenu.on { display: flex; }
+#startmenu .rail {
+  flex: none; width: 30px;
+  background: linear-gradient(180deg, var(--ember), var(--gold-deep) 55%, var(--dial-navy));
+  color: var(--ink); font-weight: 900; font-size: 12px; letter-spacing: .22em;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  display: grid; place-items: center; padding: 12px 0;
+}
+#startmenu .items { flex: 1; padding: 3px; }
+#startmenu .mi {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 8px 10px; cursor: pointer; text-align: left;
+  font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--text);
+  background: none; border: 0;
+}
+#startmenu .mi:hover { background: var(--gold); color: var(--ink); }
+#startmenu .mi .mi-i { font-size: 18px; }
+#startmenu .sep { height: 2px; margin: 4px 6px; background: var(--bevel-sh); border-bottom: 1px solid var(--bevel-hi); }
+
+/* =============================================================================
+ * MOBILE — a 9x desktop is a lie on a phone. Windows go full-bleed and stack;
+ * drag/resize is dropped rather than faked.
+ * ===========================================================================*/
+@media (max-width: 720px) {
+  .dicon { width: 76px; }
+  .dicon .gi { font-size: 27px; line-height: 32px; }
+  .win {
+    left: 0 !important; top: 0 !important;
+    width: 100% !important; height: calc(100% - var(--taskbar-h)) !important;
+  }
+  .win .grip, .win .rz { display: none; }
+  #tasks .task { max-width: 96px; }
+  #tray .phase { display: none; }
+}

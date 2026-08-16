@@ -1,0 +1,88 @@
+/* =============================================================================
+ * tokens.css — VENUS design system
+ *
+ * One palette, four lineages. Every token below is traceable to a reference:
+ *
+ *   OS chrome / bevels ....... HOFFMAN-TACTICAL  public/retro.css  (Tactical-OS 96)
+ *   Instrument interiors ..... dragonfruit-drive src/style.css + livecode.css
+ *   Dial + complication ...... knox-lux  moon-theme.tsx / moonphase-3d.tsx
+ *                              (as skinned in INFINITEPARALLEL "Blue & Gold")
+ *   Wireframe / CAD .......... INFINITEPARALLEL  js/rig.js + js/rifle.js
+ *
+ * The rotation: every source palette is re-hued onto Venus. Tactical-OS's
+ * #c0c0c0 grey chrome becomes dark brass; dragonfruit's plum/pink becomes
+ * night/sulfur; Avant Meridian's navy+champagne stays as the dial (it is
+ * already gold) but the champagne is pushed hotter.
+ * ===========================================================================*/
+
+:root {
+  /* ---- ground: Venus night side ---- */
+  --void:      #0a0702;   /* deepest — boot screen, apertures */
+  --night:     #120d04;   /* desktop base */
+  --panel:     #1d1508;   /* window face   (was retro.css --face #c0c0c0) */
+  --panel-2:   #2a1f0c;   /* raised face   (was dragonfruit --panel-2)    */
+  --sunken:    #0d0904;   /* sunken well   (was retro.css #fff)           */
+
+  /* ---- bevels: gold-tinted, replacing the 9x grey/white/black set ---- */
+  --bevel-hi:  #6d5220;   /* was --hi #ffffff */
+  --bevel-sh:  #0c0803;   /* was --sh #808080 */
+  --line:      #4a3517;
+  --line-2:    #6a4f21;
+
+  /* ---- gold: the spine of the whole thing ---- */
+  --gold:      #ffc83d;   /* primary — actions, focus, the brand */
+  --gold-hi:   #ffe9a8;   /* highlight / specular */
+  --gold-deep: #b8862a;   /* pressed, borders */
+  --brass:     #8a6f3e;   /* structural, inert chrome (knox-lux GOLD_DEEP) */
+  --champagne: #cdb07c;   /* dial text (Avant Meridian verbatim) */
+
+  /* ---- Venus itself ---- */
+  --sulfur:    #f4e04d;   /* H2SO4 cloud deck — the acid yellow */
+  --ember:     #ff7a2f;   /* 462 °C surface (infiniteparallel rifle HOT) */
+  --scorch:    #c2410c;   /* deep thermal */
+  --dial-navy: #101b33;   /* Avant Meridian moonphase navy, verbatim */
+  --dial-deep: #070b14;
+
+  /* ---- type ---- */
+  --text:      #f5ecd8;
+  --dim:       #b09a6e;
+  --faint:     #7a6640;
+  --ink:       #120d04;   /* text ON gold */
+
+  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --display: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* ---- geometry ----
+     Two radii on purpose. The OS chrome is SQUARE (Tactical-OS is a 9x
+     homage; rounding it kills the bevel). The instrument cards inside the
+     windows are ROUNDED (dragonfruit-drive's rack is 12px). The contrast
+     between the two is the whole visual joke: soft modern instruments
+     mounted in a hard retro chassis. */
+  --r-chrome:  0px;
+  --r-card:    12px;
+  --r-ctl:     8px;
+
+  --tbar-h:    24px;
+  --taskbar-h: 36px;
+
+  /* ---- glow: dragonfruit's .genbtn shadow, re-hued ---- */
+  --glow-gold: 0 0 18px rgba(255, 200, 61, .35);
+  --glow-hot:  0 0 24px rgba(255, 122, 47, .45);
+  --drop:      2px 2px 0 rgba(0, 0, 0, .5);
+}
+
+/* The site is deliberately single-theme (a dark gold instrument panel).
+   It does not invert for light mode — but it must still be legible, so we
+   only harden contrast rather than flipping the palette. */
+@media (prefers-color-scheme: light) {
+  :root { --dim: #c0a970; --faint: #8d7648; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}

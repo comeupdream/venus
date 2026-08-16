@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VENUS — $VENUS</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="VENUS-OS — a procedural desktop for the $VENUS coin. Wireframe cutaway, live Venus phase complication, generated cloud deck. Gold on 462 °C.">
+<meta name="theme-color" content="#0a0702">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="VENUS">
+<meta property="og:title" content="VENUS-OS">
+<meta property="og:description" content="A procedural desktop for the $VENUS coin. Everything on screen is generated — no textures, no sprites.">
+
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/os.css">
+<link rel="stylesheet" href="css/apps.css">
+</head>
+<body>
+
+<!-- ==========================================================================
+     BOOT — the hero moment. The wallpaper is already generating behind it.
+     ======================================================================= -->
+<div id="boot" role="status" aria-label="Booting VENUS-OS">
+  <pre id="bootpre"></pre>
+  <div id="bootos">
+    <div class="logo">VEN<b>U</b>S</div>
+    <div class="sub">92 BAR · 462 °C · 96.5% CO2</div>
+    <div class="pbar"><i id="bootbar"></i></div>
+    <div class="skip">CLICK OR PRESS ANY KEY TO SKIP</div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     DESKTOP — procedural Magellan terrain, cloud bands, icons, windows
+     ======================================================================= -->
+<div id="desktop">
+  <canvas id="wallpaper" aria-hidden="true"></canvas>
+</div>
+
+<!-- ==========================================================================
+     TASKBAR
+     ======================================================================= -->
+<div id="taskbar">
+  <button id="startbtn" aria-haspopup="menu" aria-expanded="false">
+    <span aria-hidden="true">☉</span> START
+  </button>
+  <div id="tasks" role="list"></div>
+  <div id="tray">
+    <span class="phase" id="trayphase">☾ —</span>
+    <span class="clock" id="clock">--:--</span>
+  </div>
+</div>
+
+<div id="startmenu" role="menu">
+  <div class="rail">VENUS-OS</div>
+  <div class="items"></div>
+</div>
+
+<noscript>
+  <div style="position:fixed;inset:0;z-index:10000;background:#0a0702;color:#f5ecd8;
+              display:grid;place-items:center;padding:32px;text-align:center;line-height:1.7;
+              font:14px/1.7 ui-sans-serif,system-ui,sans-serif">
+    <div style="max-width:44ch">
+      <div style="font-size:34px;font-weight:900;letter-spacing:.16em;color:#ffc83d">VENUS</div>
+      <p>This site is procedural — the terrain, the planet cutaway, the cloud deck and the
+         phase complication are all computed in the browser. It needs JavaScript enabled.</p>
+      <p style="color:#b09a6e">Venus · 6,051.8 km radius · 462 °C · 92 bar · 243-day retrograde day.</p>
+    </div>
+  </div>
+</noscript>
+
+<script src="js/venus-phase.js"></script>
+<script src="js/venus-globe.js"></script>
+<script src="js/terrain.js"></script>
+<script src="js/apps.js"></script>
+<script src="js/os.js"></script>
+</body>
+</html>

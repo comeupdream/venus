@@ -1,0 +1,164 @@
+/* =============================================================================
+ * apps.css — window interiors
+ *
+ * This is the dragonfruit-drive layer. src/style.css gave us the rack of
+ * rounded cards, the labelled knob rows, the accent-coloured range inputs and
+ * the glowing gradient action button; src/livecode/livecode.css gave us the
+ * glowing monospace editor and the canvas visualiser well. Plum/pink/mint has
+ * been rotated to night/gold/sulfur.
+ *
+ * These soft rounded instruments sit inside the hard square Tactical-OS
+ * chassis from os.css — that contrast is intentional (see tokens.css).
+ * ===========================================================================*/
+
+/* ---------- shared shell ---------- */
+.app { height: 100%; display: flex; flex-direction: column; background: var(--night); color: var(--text); }
+.app-head {
+  flex: none; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border-bottom: 1px solid var(--line);
+}
+.app-head .h-title { font-weight: 800; font-size: 13px; letter-spacing: .06em; }
+.app-head .h-sub { font-family: var(--mono); font-size: 10px; letter-spacing: .22em; color: var(--dim); }
+.app-head .spacer { flex: 1; }
+.app-body { flex: 1; overflow: auto; padding: 14px; min-height: 0; }
+.app-foot {
+  flex: none; padding: 7px 14px; font-family: var(--mono); font-size: 11px; color: var(--dim);
+  background: var(--panel); border-top: 1px solid var(--line);
+  display: flex; gap: 14px; flex-wrap: wrap;
+}
+.app-foot b { color: var(--gold); font-weight: 700; }
+
+/* ---------- controls (dragonfruit style.css) ---------- */
+.app button, .app select, .app input[type="text"], .app input[type="number"] {
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--line); border-radius: var(--r-ctl);
+  padding: 8px 12px; font: inherit; font-size: 12px;
+}
+.app button { cursor: pointer; font-weight: 700; }
+.app button:hover, .app select:hover { border-color: var(--gold); }
+.app button:focus-visible, .app select:focus-visible, .app input:focus-visible {
+  outline: 2px solid var(--gold); outline-offset: 2px;
+}
+.app button:disabled { opacity: .4; cursor: not-allowed; }
+.app .ghost { background: transparent; }
+.app .primary { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+/* the .genbtn from livecode.css, re-hued */
+.app .genbtn {
+  background: linear-gradient(90deg, var(--ember), var(--gold));
+  border-color: var(--gold); color: var(--ink); font-weight: 800;
+  box-shadow: var(--glow-gold);
+}
+.app .genbtn:hover { filter: brightness(1.08); }
+
+/* ---------- the rack ---------- */
+.rack { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
+.card {
+  width: 236px; padding: 12px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-card);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .35);
+}
+.card.wide { width: 100%; }
+.card.off { opacity: .5; }
+.card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.card-head .idx {
+  width: 20px; height: 20px; display: grid; place-items: center; flex: none;
+  background: var(--gold); color: var(--ink); border-radius: 6px;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+}
+.card-head .title { flex: 1; font-weight: 700; font-size: 12.5px; letter-spacing: .04em; }
+.card-head .tag {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em;
+  color: var(--sulfur); border: 1px solid var(--line); border-radius: 5px; padding: 2px 6px;
+}
+
+/* ---------- knob rows ---------- */
+.knob { display: grid; gap: 3px; margin: 11px 0; }
+.knob .row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.knob .name { font-size: 11px; color: var(--dim); letter-spacing: .04em; }
+.knob .val { font-family: var(--mono); font-size: 11px; color: var(--gold); }
+.knob input[type="range"] { width: 100%; accent-color: var(--gold); cursor: pointer; }
+.knob input[type="range"]:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* ---------- canvas wells (livecode.css #viz) ---------- */
+.well {
+  display: block; width: 100%; background: var(--void);
+  border: 1px solid var(--line); border-radius: 10px;
+}
+.well.tall { min-height: 320px; }
+.stage { position: relative; flex: 1; min-height: 0; background: var(--void); }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.stage canvas:active { cursor: grabbing; }
+.stage .hint {
+  position: absolute; left: 12px; bottom: 10px; pointer-events: none;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .18em; color: var(--faint);
+}
+
+/* ---------- strip / field-strip control bar (infiniteparallel rifle.js) ---------- */
+.strip {
+  flex: none; display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+  background: var(--panel); border-top: 1px solid var(--line);
+}
+.strip label { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; color: var(--dim); flex: none; }
+.strip input[type="range"] { flex: 1; accent-color: var(--gold); }
+.strip .readout { font-family: var(--mono); font-size: 11px; color: var(--gold); min-width: 132px; text-align: right; }
+
+/* ---------- terminal (dragonfruit livecode editor glow + MT-DOS) ---------- */
+.term {
+  height: 100%; display: flex; flex-direction: column; padding: 10px;
+  background: var(--void); color: var(--sulfur);
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.65;
+}
+.term .out { flex: 1; overflow: auto; white-space: pre-wrap; word-break: break-word; text-shadow: 0 0 8px rgba(244, 224, 77, .3); }
+.term .out .u { color: var(--gold-hi); }
+.term .out .e { color: var(--ember); }
+.term .out .d { color: var(--faint); }
+.term .line { display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }
+.term .ps { color: var(--gold); white-space: nowrap; }
+.term .in { flex: 1; background: none; border: 0; outline: 0; font: inherit; color: var(--sulfur); caret-color: var(--gold); }
+
+/* ---------- dial (knox-lux moonphase) ---------- */
+.dial-app { background: linear-gradient(180deg, var(--dial-navy), var(--dial-deep)); }
+.dial-wrap { flex: 1; display: grid; place-items: center; padding: 18px; min-height: 0; }
+.dial-wrap canvas { display: block; max-width: 100%; height: auto; }
+.dial-facts {
+  flex: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 1px;
+  background: var(--line); border-top: 1px solid var(--line);
+}
+.dial-facts div { background: var(--dial-navy); padding: 9px 12px; }
+.dial-facts dt { font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em; color: var(--dim); margin: 0 0 3px; }
+.dial-facts dd { margin: 0; font-size: 13px; font-weight: 700; color: var(--champagne); }
+
+/* ---------- prose / spec sheets ---------- */
+.prose { max-width: 62ch; line-height: 1.7; font-size: 13px; color: var(--text); }
+.prose h2 { font-size: 15px; letter-spacing: .04em; color: var(--gold); margin: 20px 0 8px; }
+.prose h2:first-child { margin-top: 0; }
+.prose p { margin: 0 0 12px; color: var(--dim); }
+.prose strong { color: var(--text); }
+.prose code {
+  font-family: var(--mono); font-size: 12px; color: var(--sulfur);
+  background: var(--panel); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px;
+}
+.prose .placeholder {
+  display: block; margin: 6px 0 14px; padding: 10px 12px;
+  font-family: var(--mono); font-size: 12px; color: var(--sulfur); word-break: break-all;
+  background: var(--panel); border: 1px dashed var(--gold-deep); border-radius: var(--r-ctl);
+}
+.prose .placeholder b { display: block; font-family: var(--sans); font-size: 9.5px; letter-spacing: .2em; color: var(--faint); margin-bottom: 4px; }
+
+.spec { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.spec th, .spec td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.spec th { font-family: var(--mono); font-size: 10px; letter-spacing: .16em; color: var(--dim); font-weight: 400; }
+.spec td { color: var(--text); }
+.spec td.n { font-family: var(--mono); color: var(--gold); text-align: right; }
+
+/* ---------- notice: anything that must not read as live market data ---------- */
+.notice {
+  display: flex; gap: 9px; align-items: flex-start; margin-bottom: 14px; padding: 9px 12px;
+  font-size: 11.5px; line-height: 1.5; color: var(--text);
+  background: rgba(255, 122, 47, .1);
+  border: 1px solid var(--ember); border-radius: var(--r-ctl);
+}
+.notice .ni { flex: none; }
+.notice b { color: var(--ember); }

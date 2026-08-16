@@ -245,14 +245,18 @@ window.VENUSGLOBE = (function () {
     resize();
     addEventListener('resize', resize);
 
-    var last = performance.now();
+    /* 30fps cap — ~1,200 stroked wires per frame is wasted at 144Hz — and a
+       hard skip when the window is minimized or the canvas is display:none */
+    var last = performance.now(), acc = 0;
     (function loop(now) {
       requestAnimationFrame(loop);
-      var dt = Math.min(64, now - last); last = now;
+      var dt = Math.min(64, now - last); last = now; acc += dt;
+      if (acc < 33) return;
       /* Venus rotates retrograde — so does this, and slowly. It is the
          slowest rotation in the solar system; the site should not lie. */
-      if (!dragging && !reduce) spin -= dt * 0.00006;
-      if (!document.hidden) draw();
+      if (!dragging && !reduce) spin -= acc * 0.00006;
+      if (!document.hidden && canvas.offsetParent) draw();
+      acc = 0;
     })(last);
 
     return {

@@ -66,14 +66,23 @@ window.VENUSSAVER = (function () {
         if (bx <= 0 || bx + tw >= W) { vx = -vx; tint = (tint + 1) % TINTS.length; bx = Math.max(0, Math.min(W - tw, bx)); }
         if (by - th <= 0 || by >= H) { vy = -vy; tint = (tint + 1) % TINTS.length; by = Math.max(th, Math.min(H, by)); }
       }
-      ctx.font = '900 ' + fs + 'px ui-sans-serif, system-ui, sans-serif';
-      ctx.fillStyle = TINTS[tint];
-      ctx.shadowColor = TINTS[tint]; ctx.shadowBlur = 24 * dpr;
-      ctx.fillText('VENUS', bx, by);
+      /* the brand wordmark: white racing italic, dark outline, tinted glow */
+      ctx.save();
+      ctx.translate(bx, by);
+      ctx.transform(1, 0, -0.16, 1, 0, 0);
+      ctx.font = 'italic 900 ' + fs + 'px "Arial Black", ui-sans-serif, system-ui, sans-serif';
+      ctx.lineWidth = Math.max(2, fs * 0.05);
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#241a0a';
+      ctx.shadowColor = TINTS[tint]; ctx.shadowBlur = 26 * dpr;
+      ctx.strokeText('VENUS', 0, 0);
       ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('VENUS', 0, 0);
+      ctx.restore();
       ctx.font = (fs * 0.18) + 'px ui-monospace, monospace';
       ctx.fillStyle = 'rgba(176,154,110,.8)';
-      ctx.fillText('4 6 2 ° C   A N D   D R E A M I N G', bx + 4, by + fs * 0.34);
+      ctx.fillText('4 6 2 ° C   A N D   D R E A M I N G', bx + 4, by + fs * 0.36);
     })(last);
 
     stopFn = function () {
@@ -107,8 +116,15 @@ window.VENUSSAVER = (function () {
     if (reduce) return;                        /* never auto-start */
     idleTimer = setTimeout(start, IDLE_MS);
   }
+  /* re-arm at most once a second — clearTimeout/setTimeout churn on every
+     pointermove is pointless work at mouse-move frequency */
+  var lastArm = 0;
   ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) {
-    addEventListener(ev, function () { if (!running) arm(); }, { passive: true });
+    addEventListener(ev, function () {
+      if (running) return;
+      var n = Date.now();
+      if (n - lastArm > 1000) { lastArm = n; arm(); }
+    }, { passive: true });
   });
   arm();
 

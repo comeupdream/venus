@@ -407,27 +407,27 @@ window.TERRAIN = (function () {
     var stars = Starfield(0x5EED, 150);
     var W = 0, H = 0;
 
+    /* The plate never changes between frames — only the stars do. Rescaling
+       the full-resolution webp onto a 2x-DPR fullscreen canvas 30 times a
+       second was the page's single biggest steady cost (the audit clocked the
+       page dropping to half-rate on it). So the scaled composition is baked
+       ONCE per resize into an offscreen canvas, and the frame loop does a
+       1:1 blit — cheap — under a sky repaint. */
+    var land = null, landTop = 0;
+
     function resize() {
       var w = canvas.clientWidth || window.innerWidth;
       var h = canvas.clientHeight || window.innerHeight;
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = W = Math.round(w * dpr);
       canvas.height = H = Math.round(h * dpr);
-    }
-
-    function draw(twinkle) {
-      /* sky first — the plate is drawn source-cropped at its first terrain
-         row, so the black above it is OURS and the stars live there. The
-         sliver between peak tips and the main horizon comes from the plate
-         and its black gaps occlude stars exactly like mountains should. */
-      ctx.fillStyle = '#050301';
-      ctx.fillRect(0, 0, W, H);
-      stars.paint(ctx, W, H * HORIZON_FRAC, twinkle);
 
       /* Cover the width; if the plate is so wide its land would come up short
          of the bottom quarter, scale up and crop the sides instead. The
          plate's main horizon is pinned to the 75% line and the foreground
-         below the viewport is cropped away. */
+         below the viewport is cropped away. Source-crop starts at the first
+         terrain row so no summit is lost; the black gaps in that peak band
+         occlude stars exactly like mountains should. */
       var s = Math.max(
         W / image.width,
         ((1 - HORIZON_FRAC) * H) / (landFrac * image.height)
@@ -435,9 +435,21 @@ window.TERRAIN = (function () {
       var sy = hz.first * image.height;
       var dw = image.width * s;
       var dx = (W - dw) / 2;
-      var dy = H * HORIZON_FRAC - (hz.main - hz.first) * image.height * s;
-      ctx.drawImage(image, 0, sy, image.width, image.height - sy,
-                    dx, dy, dw, (image.height - sy) * s);
+      landTop = Math.round(H * HORIZON_FRAC - (hz.main - hz.first) * image.height * s);
+
+      land = document.createElement('canvas');
+      land.width = W;
+      land.height = Math.max(1, H - landTop);
+      land.getContext('2d').drawImage(
+        image, 0, sy, image.width, image.height - sy,
+        dx, 0, dw, (image.height - sy) * s);
+    }
+
+    function draw(twinkle) {
+      ctx.fillStyle = '#050301';
+      ctx.fillRect(0, 0, W, landTop);
+      stars.paint(ctx, W, H * HORIZON_FRAC, twinkle);
+      ctx.drawImage(land, 0, landTop);
     }
 
     resize();

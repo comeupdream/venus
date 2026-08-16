@@ -58,7 +58,12 @@
         '<button class="tb" data-a="close" title="Close" aria-label="Close">×</button>' +
       '</div>' +
       '<div class="wbody plain"></div>' +
-      '<i class="grip"></i><i class="rz ne"></i><i class="rz nw"></i><i class="rz sw"></i>';
+      /* resize zones per HOFFMAN retro.js: se grip + s/e/w edges + sw corner.
+         Deliberately NO top corners — they'd sit on the titlebar buttons and
+         steal the close click. */
+      '<i class="grip"></i>' +
+      '<i class="rz s" data-d="s"></i><i class="rz e" data-d="e"></i>' +
+      '<i class="rz w" data-d="w"></i><i class="rz sw" data-d="sw"></i>';
 
     desktop.appendChild(node);
     var body = node.querySelector('.wbody');
@@ -79,7 +84,7 @@
     node.querySelector('.grip').addEventListener('pointerdown', function (e) { startResize(e, key, 'se'); });
     node.querySelectorAll('.rz').forEach(function (h) {
       h.addEventListener('pointerdown', function (e) {
-        startResize(e, key, h.className.replace('rz ', ''));
+        startResize(e, key, h.dataset.d);
       });
     });
     node.querySelectorAll('.tb').forEach(function (b) {
@@ -155,6 +160,7 @@
     if (!o || o.max || window.matchMedia('(max-width: 720px)').matches) return;
     var r = o.node.getBoundingClientRect();
     drag = { key: key, ox: e.clientX - r.left, oy: e.clientY - r.top };
+    o.node.classList.add('dragging');
     document.body.classList.add('wm-drag');
   }
   function startResize(e, key, dir) {
@@ -163,21 +169,32 @@
     e.stopPropagation();
     var r = o.node.getBoundingClientRect();
     rsz = { key: key, dir: dir, x: e.clientX, y: e.clientY, w: r.width, h: r.height, l: r.left, t: r.top };
+    o.node.classList.add('dragging');
     document.body.classList.add('wm-drag');
   }
 
-  addEventListener('pointermove', function (e) {
+  /* Pointer events can fire several times per display frame; writing styles
+     on each one forces redundant style/paint work and is exactly what makes a
+     drag feel sticky. Coalesce: the handler only records the latest position
+     (passive, so it never blocks scrolling/compositing) and one rAF applies
+     it per frame. */
+  var pendMove = null, moveRaf = 0;
+
+  function applyMove() {
+    moveRaf = 0;
+    var e = pendMove;
+    if (!e) return;
     if (drag) {
       var o = wins[drag.key];
       if (!o) return;
-      var x = Math.max(-40, Math.min(window.innerWidth - 60, e.clientX - drag.ox));
-      var y = Math.max(0, Math.min(window.innerHeight - 44, e.clientY - drag.oy));
+      var x = Math.max(-40, Math.min(window.innerWidth - 60, e.x - drag.ox));
+      var y = Math.max(0, Math.min(window.innerHeight - 44, e.y - drag.oy));
       o.node.style.left = x + 'px';
       o.node.style.top = y + 'px';
     } else if (rsz) {
       var o2 = wins[rsz.key];
       if (!o2) return;
-      var dx = e.clientX - rsz.x, dy = e.clientY - rsz.y;
+      var dx = e.x - rsz.x, dy = e.y - rsz.y;
       var w = rsz.w, h = rsz.h, l = rsz.l, t = rsz.t;
       if (rsz.dir.indexOf('e') > -1) w = rsz.w + dx;
       if (rsz.dir.indexOf('s') > -1) h = rsz.h + dy;
@@ -189,10 +206,21 @@
       o2.node.style.left = l + 'px';
       o2.node.style.top = t + 'px';
     }
-  });
+  }
+
+  addEventListener('pointermove', function (e) {
+    if (!drag && !rsz) return;
+    pendMove = { x: e.clientX, y: e.clientY };
+    if (!moveRaf) moveRaf = requestAnimationFrame(applyMove);
+  }, { passive: true });
+
   addEventListener('pointerup', function () {
-    if (drag || rsz) window.dispatchEvent(new Event('resize'));
-    drag = null; rsz = null;
+    if (drag || rsz) {
+      var o = wins[(drag || rsz).key];
+      if (o) o.node.classList.remove('dragging');
+      window.dispatchEvent(new Event('resize'));
+    }
+    drag = null; rsz = null; pendMove = null;
     document.body.classList.remove('wm-drag');
   });
 
@@ -336,13 +364,8 @@
     bootEl.style.transition = 'opacity .5s';
     bootEl.style.opacity = '0';
     setTimeout(function () { bootEl.remove(); }, 520);
-    /* open the two showpieces so the desktop is never empty on arrival */
-    if (!matchMedia('(max-width: 720px)').matches) {
-      openApp('globe');
-      setTimeout(function () { openApp('phase'); }, 260);
-    } else {
-      openApp('globe');
-    }
+    /* one showpiece on arrival — the rest is what the desktop is for */
+    openApp('globe');
   }
   function skipBoot() {
     if (booted) return;

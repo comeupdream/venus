@@ -103,7 +103,10 @@ window.VENUSAPPS = Object.assign(window.VENUSAPPS || {}, (function () {
       var f = {};
       node.querySelectorAll('[data-f]').forEach(function (n) { f[n.dataset.f] = n; });
 
-      return loop(function () {
+      var acc = 0;
+      return loop(function (dt) {
+        acc += dt; if (acc < 33) return; acc = 0;   /* 30fps is plenty for a dial */
+        if (!cv.offsetParent) return;
         var now = new Date();
         var p = window.VENUSPHASE.venusPhase(now);
         window.VENUSPHASE.drawDial(cv, p, now);
@@ -204,8 +207,12 @@ window.VENUSAPPS = Object.assign(window.VENUSAPPS || {}, (function () {
         return t;
       }
 
-      var t = 0;
+      var t = 0, cacc = 0;
       return loop(function (dt) {
+        /* ~1.2M noise ops per paint — 30fps and only while visible */
+        cacc += dt; if (cacc < 33) return;
+        if (!cv.offsetParent) { cacc = 0; return; }
+        dt = cacc; cacc = 0;
         t += dt * 0.001 * (0.2 + K.drift / 100 * 2.4);
         var d = img.data, p = 0;
         var turb = K.turb / 100, shear = K.shear / 100;

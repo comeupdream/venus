@@ -58,12 +58,24 @@ body {
   display: flex; flex-direction: column; align-items: center; gap: 14px;
   pointer-events: none;
 }
-#bootos .logo {
-  font-family: var(--display); font-weight: 900; font-size: clamp(34px, 9vw, 58px);
-  letter-spacing: .16em; color: var(--gold-hi);
-  text-shadow: var(--drop), 0 0 34px rgba(255, 200, 61, .55);
+/* ---- the wordmark, everywhere the word VENUS stands alone ----
+   Matches assets/logo.jpg: heavy racing italic, white fill, dark outline,
+   gold glow. 'Arial Black' is the closest weight universally installed;
+   the skew supplies the logo's forward lean. */
+.vmark {
+  font-family: "Arial Black", "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 900; font-style: italic;
+  transform: skewX(-8deg);
+  letter-spacing: .02em; color: #fff;
+  -webkit-text-stroke: 2px #241a0a;
+  text-shadow: 3px 3px 0 rgba(10, 7, 2, .85), 0 0 34px rgba(255, 200, 61, .6);
 }
-#bootos .logo b { color: var(--ember); }
+
+#bootos .coin {
+  width: clamp(110px, 22vw, 180px); height: auto; border-radius: 50%;
+  box-shadow: 0 0 70px rgba(255, 200, 61, .4), 0 0 24px rgba(255, 200, 61, .5);
+}
+#bootos .logo { font-size: clamp(30px, 7.5vw, 52px); }
 #bootos .sub {
   font-family: var(--mono); font-size: 11px; letter-spacing: .34em;
   color: var(--sulfur); text-shadow: 0 1px 3px #000;
@@ -190,25 +202,28 @@ body.space-view #desktop::before { display: none; }   /* no cloud wash in orbit 
 }
 .win .wbody.plain { margin: 0; border: 0; background: var(--panel); }
 
-/* resize handles — retro.css used glowing red triangles; gold here */
-.win .grip, .win .rz {
+/* resize handles — geometry ported from HOFFMAN retro.css: visible corner
+   triangles bottom-left/right, invisible grab rails on s/e/w only. The side
+   rails start 40px down so nothing ever overlaps the titlebar buttons. */
+.win .grip, .win .rz.sw {
   position: absolute; z-index: 8; width: 20px; height: 20px; background: none;
 }
-.win .grip     { right: 0; bottom: 0; cursor: nwse-resize; }
-.win .rz.ne    { top: 0; right: 0; cursor: nesw-resize; }
-.win .rz.nw    { top: 0; left: 0;  cursor: nwse-resize; }
-.win .rz.sw    { bottom: 0; left: 0; cursor: nesw-resize; }
-.win .grip::after, .win .rz::after {
+.win .grip  { right: 0; bottom: 0; cursor: nwse-resize; }
+.win .rz.sw { bottom: 0; left: 0; cursor: nesw-resize; }
+.win .grip::after, .win .rz.sw::after {
   content: ""; position: absolute; width: 11px; height: 11px;
   background: var(--gold); opacity: .5; filter: drop-shadow(0 0 3px var(--gold));
 }
 .win .grip::after  { right: 1px; bottom: 1px; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
-.win .rz.ne::after { right: 1px; top: 1px;    clip-path: polygon(0 0, 100% 0, 100% 100%); }
-.win .rz.nw::after { left: 1px;  top: 1px;    clip-path: polygon(0 0, 100% 0, 0 100%); }
 .win .rz.sw::after { left: 1px;  bottom: 1px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+.win .rz.s { position: absolute; z-index: 7; bottom: -4px; left: 14px; right: 14px; height: 9px; cursor: ns-resize; }
+.win .rz.e { position: absolute; z-index: 7; right: -4px; top: 40px; bottom: 14px; width: 9px; cursor: ew-resize; }
+.win .rz.w { position: absolute; z-index: 7; left: -4px;  top: 40px; bottom: 14px; width: 9px; cursor: ew-resize; }
 
 body.wm-drag { cursor: grabbing; }
 body.wm-drag iframe, body.wm-drag canvas { pointer-events: none; }
+/* the 50px blur shadow repaints on every moved pixel — drop it mid-drag */
+.win.dragging { box-shadow: 3px 3px 0 rgba(0, 0, 0, .55); will-change: left, top, width, height; }
 
 /* =============================================================================
  * TASKBAR + START

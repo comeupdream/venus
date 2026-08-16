@@ -169,6 +169,19 @@ window.VENUSICONS = (function () {
       '<path d="M28 7.5L14.3 18" stroke="' + D + '" stroke-width="1.3"/>' +
       '<path d="M3 25.5c3-2.2 5 2.2 8 0M5 29c3-2.2 5 2.2 8 0" stroke="' + S + '" stroke-width="1.6" fill="none" stroke-linecap="round"/>'),
 
+    /* the manual */
+    info: svg(
+      '<circle cx="16" cy="16" r="12.5" fill="' + N + '" stroke="' + G + '" stroke-width="2"/>' +
+      '<circle cx="16" cy="9.5" r="2.1" fill="' + S + '"/>' +
+      '<path d="M13 14.5h3.6V22" stroke="' + G + '" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
+      '<path d="M12.5 22.5h7" stroke="' + G + '" stroke-width="2.6" stroke-linecap="round"/>'),
+
+    /* gold bar with a heartbeat — the RWA feed */
+    market: svg(
+      '<path d="M8 18h16l3 8H5Z" fill="' + G + '" stroke="' + K + '"/>' +
+      '<path d="M8 18l3-4h10l3 4Z" fill="' + H + '" stroke="' + K + '"/>' +
+      '<path d="M3 9h6l2-3.5L14.5 11l2.5-5 2 3h7" stroke="' + E + '" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>'),
+
     /* the start button glyph, tiny sun */
     start: svg(
       '<circle cx="16" cy="16" r="7" fill="' + K + '"/>' +

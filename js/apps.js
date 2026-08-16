@@ -368,7 +368,8 @@ window.VENUSAPPS = Object.assign(window.VENUSAPPS || {}, (function () {
               '<span class="placeholder" id="venus-ca" style="cursor:pointer" ' +
                 'title="Click to copy"><b>CONTRACT ADDRESS · CLICK TO COPY</b>' +
                 '0x5460b5E88799D27bbdf8A210926C17Dec18d7777</span>' +
-              '<span class="placeholder"><b>CHAIN</b>—</span>' +
+              '<span class="placeholder"><b>CHAIN</b>BNB Smart Chain (BEP-20)</span>' +
+              '<span class="placeholder"><b>EMITS</b>XAUt (Tether Gold) — RWA rewards, see INFO / FAQ</span>' +
               '<h2>Supply</h2>' +
               '<table class="spec">' +
                 '<tr><th>Total supply</th><td class="n">—</td></tr>' +

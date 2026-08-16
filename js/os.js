@@ -319,9 +319,21 @@
       var ph = window.VENUSPHASE.venusPhase(d);
       $('#trayphase').textContent = '☾ ' + (ph.illumination * 100).toFixed(1) + '% · ' + ph.name;
     }
+    /* live price chip, only when the feed has a pair */
+    if (window.VENUSMARKET) {
+      var m = window.VENUSMARKET.get();
+      var el2 = $('#trayprice');
+      if (m.last && m.last.priceUsd && el2) {
+        var chg = m.last.priceChange && m.last.priceChange.h24;
+        el2.textContent = '$VENUS ' + (+(+m.last.priceUsd).toPrecision(4)) +
+          (chg == null ? '' : ' ' + (chg >= 0 ? '▲' : '▼'));
+        el2.style.color = chg == null || chg >= 0 ? 'var(--gold)' : 'var(--ember)';
+      } else if (el2) el2.textContent = '';
+    }
   }
   tickTray();
   setInterval(tickTray, 15000);
+  if (window.VENUSMARKET) window.VENUSMARKET.onUpdate(tickTray);
 
   /* =========================================================================
    * BOOT — retro.js's typed POST, with a Venus entry sequence

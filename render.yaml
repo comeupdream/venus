@@ -1,0 +1,18 @@
+# Render Blueprint — VENUS-OS is a static site with NO build step.
+# Everything is computed in the browser; there is nothing to compile.
+#
+#   Build command   : (none — leave empty)
+#   Publish path    : .
+#   Start command   : n/a for a static site (any static server works locally:
+#                     `python3 -m http.server` or `npx serve`)
+services:
+  - type: web
+    name: venus
+    runtime: static
+    branch: claude/venus-crypto-site-design-3p70q1
+    buildCommand: ""
+    staticPublishPath: .
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=604800

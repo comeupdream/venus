@@ -5,10 +5,13 @@
  * speak dragonfruit-drive (rack cards, labelled knobs, canvas wells, glowing
  * gradient action buttons); the chassis around them is Tactical-OS.
  *
- * Registered on window.VENUSAPPS before os.js reads it.
+ * Registered on window.VENUSAPPS before os.js reads it. Additional apps live
+ * as one file each under js/apps/ and merge themselves into the same registry
+ * (loaded after this file, before os.js) using the window.VENUSKIT helpers
+ * this file exports.
  * ===========================================================================*/
 
-window.VENUSAPPS = (function () {
+window.VENUSAPPS = Object.assign(window.VENUSAPPS || {}, (function () {
   'use strict';
 
   var raf = [];   /* every app that animates registers its id here to be killed */
@@ -25,6 +28,9 @@ window.VENUSAPPS = (function () {
   }
 
   function h(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+
+  /* the toolkit every js/apps/* file builds with */
+  window.VENUSKIT = { loop: loop, h: h };
 
   /* =========================================================================
    * VENUS.EXE — the wireframe field-strip
@@ -259,8 +265,10 @@ window.VENUSAPPS = (function () {
         help: function () {
           say('  phase      current Venus phase, computed live');
           say('  venus      physical data sheet');
-          say('  open X     launch an app (globe, phase, clouds, coin, refs)');
+          say('  open X     launch an app: ' + Object.keys(window.VENUSOS.apps).join(' '));
           say('  view X     switch the desktop: view surface | view space');
+          say('  saver      start the screensaver now');
+          say('  vesper     summon / dismiss the mascot');
           say('  seed       reseed the wallpaper terrain');
           say('  credits    where every visual cue came from');
           say('  clear      clear this buffer');
@@ -294,6 +302,14 @@ window.VENUSAPPS = (function () {
           }
           window.VENUSOS.setView(a, true);
           say('  switching to ' + a.toUpperCase() + ' view…');
+        },
+        saver: function () {
+          if (window.VENUSSAVER) { say('  dimming the lights…'); window.VENUSSAVER.start(); }
+          else say('<span class="e">  no screensaver module loaded</span>');
+        },
+        vesper: function () {
+          if (window.VESPER) { window.VESPER.toggle(); say('  VESPER acknowledged.'); }
+          else say('<span class="e">  no mascot module loaded</span>');
         },
         seed: function () {
           say('  reseeding terrain…');
@@ -337,12 +353,14 @@ window.VENUSAPPS = (function () {
           '<div class="app-head"><span class="h-title">TOKEN SHEET</span>' +
             '<span class="spacer"></span><span class="h-sub">DRAFT</span></div>' +
           '<div class="app-body">' +
-            '<div class="notice"><span class="ni">⚠</span><span><b>Scaffold, not a listing.</b> ' +
-              'Every figure below is an unfilled slot. Nothing on this site quotes a price, ' +
-              'and no field should be filled in until it is true.</span></div>' +
+            '<div class="notice"><span class="ni">⚠</span><span><b>Draft sheet.</b> ' +
+              'Nothing on this site quotes a price, and unfilled slots stay blank ' +
+              'until they are true.</span></div>' +
             '<div class="prose">' +
               '<h2>Contract</h2>' +
-              '<span class="placeholder"><b>CONTRACT ADDRESS</b>0x…</span>' +
+              '<span class="placeholder" id="venus-ca" style="cursor:pointer" ' +
+                'title="Click to copy"><b>CONTRACT ADDRESS · CLICK TO COPY</b>' +
+                '0x5460b5E88799D27bbdf8A210926C17Dec18d7777</span>' +
               '<span class="placeholder"><b>CHAIN</b>—</span>' +
               '<h2>Supply</h2>' +
               '<table class="spec">' +
@@ -366,6 +384,16 @@ window.VENUSAPPS = (function () {
           '</div>' +
         '</div>'
       ));
+      var ca = node.querySelector('#venus-ca');
+      ca.addEventListener('click', function () {
+        var addr = '0x5460b5E88799D27bbdf8A210926C17Dec18d7777';
+        var done = function () {
+          var b = ca.querySelector('b');
+          b.textContent = 'CONTRACT ADDRESS · COPIED ✓';
+          setTimeout(function () { b.textContent = 'CONTRACT ADDRESS · CLICK TO COPY'; }, 1400);
+        };
+        if (navigator.clipboard) navigator.clipboard.writeText(addr).then(done, function () {});
+      });
       return null;
     }
   };
@@ -413,4 +441,4 @@ window.VENUSAPPS = (function () {
   };
 
   return { globe: globe, phase: phase, clouds: clouds, term: term, coin: coin, refs: refs };
-})();
+})());

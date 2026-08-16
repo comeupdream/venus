@@ -19,6 +19,13 @@
 
   var desktop = $('#desktop');
   var wins = {};
+
+  /* SVG icon from js/icons.js when one exists, the app's text glyph if not */
+  function icoHTML(key, cfg) {
+    var s = window.VENUSICONS && window.VENUSICONS[key];
+    return s ? '<span class="svgi">' + s + '</span>'
+             : '<span aria-hidden="true">' + cfg.icon + '</span>';
+  }
   var zTop = 20;
   var drag = null, rsz = null;
   var booted = false;
@@ -44,7 +51,7 @@
     node.setAttribute('aria-label', cfg.title);
     node.innerHTML =
       '<div class="tbar">' +
-        '<span class="ti" aria-hidden="true">' + cfg.icon + '</span>' +
+        '<span class="ti" aria-hidden="true">' + icoHTML(key, cfg) + '</span>' +
         '<span class="tt">' + cfg.title + '</span>' +
         '<button class="tb" data-a="min" title="Minimise" aria-label="Minimise">_</button>' +
         '<button class="tb" data-a="max" title="Maximise" aria-label="Maximise">□</button>' +
@@ -131,7 +138,7 @@
     var cfg = APPS[key];
     var t = el('button', 'task');
     t.dataset.k = key;
-    t.innerHTML = '<span aria-hidden="true">' + cfg.icon + '</span><span>' + cfg.title + '</span>';
+    t.innerHTML = icoHTML(key, cfg) + '<span>' + cfg.title + '</span>';
     t.addEventListener('click', function () {
       var o = wins[key];
       if (!o) return;
@@ -194,13 +201,17 @@
    * =======================================================================*/
   var ICONS = Object.keys(APPS).filter(function (k) { return APPS[k].desktop !== false; });
 
+  /* columns fill top-to-bottom, sized to the viewport — a 20-app desktop
+     should wrap into more columns, not run under the taskbar */
+  var ICON_ROWS = Math.max(4, Math.floor((window.innerHeight - 54) / 92));
+
   ICONS.forEach(function (key, i) {
     var cfg = APPS[key];
     var d = el('button', 'dicon');
-    var col = Math.floor(i / 5), row = i % 5;
+    var col = Math.floor(i / ICON_ROWS), row = i % ICON_ROWS;
     d.style.left = (18 + col * 104) + 'px';
     d.style.top = (18 + row * 92) + 'px';
-    d.innerHTML = '<div class="gi" aria-hidden="true">' + cfg.icon + '</div><div class="lbl">' + cfg.title + '</div>';
+    d.innerHTML = '<div class="gi" aria-hidden="true">' + icoHTML(key, cfg) + '</div><div class="lbl">' + cfg.title + '</div>';
     d.addEventListener('click', function () {
       document.querySelectorAll('.dicon').forEach(function (x) { x.classList.remove('sel'); });
       d.classList.add('sel');
@@ -229,7 +240,7 @@
   Object.keys(APPS).filter(function (k) { return APPS[k].menu !== false; }).forEach(function (key) {
     var cfg = APPS[key];
     var m = el('button', 'mi');
-    m.innerHTML = '<span class="mi-i" aria-hidden="true">' + cfg.icon + '</span><span>' + cfg.title + '</span>';
+    m.innerHTML = '<span class="mi-i" aria-hidden="true">' + icoHTML(key, cfg) + '</span><span>' + cfg.title + '</span>';
     m.addEventListener('click', function () { closeStart(); openApp(key); });
     items.appendChild(m);
   });
@@ -238,6 +249,11 @@
   shut.innerHTML = '<span class="mi-i" aria-hidden="true">⏻</span><span>Shut Down…</span>';
   shut.addEventListener('click', function () { closeStart(); shutDown(); });
   items.appendChild(shut);
+
+  if (window.VENUSICONS && window.VENUSICONS.start) {
+    $('#startbtn').innerHTML =
+      '<span class="svgi" style="width:16px;height:16px">' + window.VENUSICONS.start + '</span> START';
+  }
 
   function openStart() { sm.classList.add('on'); $('#startbtn').classList.add('on'); }
   function closeStart() { sm.classList.remove('on'); $('#startbtn').classList.remove('on'); }

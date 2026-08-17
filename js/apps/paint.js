@@ -213,6 +213,7 @@
         a.download = 'venus-paint.png';
         a.href = cv.toDataURL('image/png');
         a.click();
+        if (window.VENUSACH) window.VENUSACH.unlock('painter');
       });
 
       return function () { style.remove(); ro.disconnect(); };

@@ -10,6 +10,7 @@ var CORE = [
   'css/tokens.css', 'css/os.css', 'css/apps.css',
   'assets/favicon.svg', 'assets/logo.jpg', 'assets/hero-terrain.webp',
   'js/venus-phase.js', 'js/venus-globe.js', 'js/terrain.js', 'js/icons.js',
+  'js/fx.js', 'js/achieve.js',
   'js/coin.js', 'js/cabar.js', 'js/share.js', 'js/apps.js',
   'js/screensaver.js', 'js/vesper.js', 'js/os.js'
 ];

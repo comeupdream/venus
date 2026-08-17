@@ -612,6 +612,7 @@
             if (G.levelIdx + 1 < LEVELS.length) { loadLevel(G.levelIdx + 1, true); chip.start(); }
             else {
               G.state = 'victory';
+              if (window.VENUSACH) window.VENUSACH.unlock('sv_clear');
               if (G.score > best) { best = G.score; try { localStorage.setItem('venus-supervesper-best', String(best)); } catch (e) {} showBest(); }
             }
           }
@@ -952,6 +953,7 @@
             jumpBuf = 0;
             loadLevel(0);
             chip.start();
+            if (window.VENUSACH) window.VENUSACH.unlock('sv_start');
           }
           render();
           return;

@@ -98,7 +98,8 @@
           /* aero heating in the fast thin phase + ambient soak lower down */
           var ambient = 462 - Math.max(0, alt) / 62000 * 507;
           hull += (rho * Math.pow(vel, 3) * 4e-6 + (ambient - hull) * 0.004) * s * 12;
-          if (hull > 380) { st = 'dead'; f.phase.textContent = 'BURNED UP'; btn.textContent = 'RETRY'; }
+          if (hull > 380) { st = 'dead'; f.phase.textContent = 'BURNED UP'; btn.textContent = 'RETRY';
+            if (window.VENUSACH) window.VENUSACH.unlock('cooked'); }
           if (alt <= 0) {
             alt = 0;
             if (vel <= 10) { st = 'surface'; f.phase.textContent = 'TOUCHDOWN ✓'; btn.textContent = 'TRANSMIT'; heat = 30; }
@@ -108,6 +109,7 @@
           surfT += s;
           heat += (transmitting ? 1.15 : 0.55) * s;
           if (transmitting) score += 14 * s;
+          if (score >= 500 && window.VENUSACH) window.VENUSACH.unlock('science');
           if (heat >= 100) {
             st = 'done'; btn.textContent = 'AGAIN';
             var total = Math.round(score + surfT);

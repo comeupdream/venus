@@ -98,6 +98,7 @@
         if (busy) return;
         busy = true;
         try { localStorage.setItem('venus-gold-addr', addr); } catch (e) {}
+        if (window.VENUSACH) window.VENUSACH.unlock('goldscan');
         f.stat.textContent = 'ASKING THE CHAIN…';
         f.rows.innerHTML = '<tr><td colspan="3" style="color:var(--faint)">Scanning…</td></tr>';
 

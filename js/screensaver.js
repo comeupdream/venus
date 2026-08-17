@@ -19,6 +19,7 @@ window.VENUSSAVER = (function () {
   function start() {
     if (running) return;
     running = true;
+    if (window.VENUSACH) window.VENUSACH.unlock('saver');
 
     cv = document.createElement('canvas');
     cv.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:9500;cursor:none;background:#050301';

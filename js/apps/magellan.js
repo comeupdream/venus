@@ -169,6 +169,8 @@
         if (fuel <= 0 || pct >= 100) {
           over = true;
           f.stat.textContent = pct >= 80 ? 'MISSION COMPLETE · ' + pct.toFixed(1) + '%' : 'FUEL SPENT · ' + pct.toFixed(1) + '%';
+          if (pct >= 80 && window.VENUSACH) window.VENUSACH.unlock('mapped');
+          if (ANOMALIES.every(function (a) { return a.found; }) && window.VENUSACH) window.VENUSACH.unlock('anomaly3');
           if (pct > best) { best = pct; try { localStorage.setItem('venus-magellan-best', String(pct)); } catch (e) {} f.best.textContent = 'BEST ' + best.toFixed(1) + '%'; }
         }
 

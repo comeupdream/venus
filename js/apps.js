@@ -67,6 +67,7 @@ window.VENUSAPPS = Object.assign(window.VENUSAPPS || {}, (function () {
         var v = range.value / 100;
         g.setStrip(v);
         read.textContent = v === 0 ? 'ASSEMBLED' : v === 1 ? 'FULLY STRIPPED' : (v * 100).toFixed(0) + '% SEPARATED';
+        if (v === 1 && window.VENUSACH) window.VENUSACH.unlock('strip');
       }
       range.addEventListener('input', apply);
       apply();
@@ -275,6 +276,7 @@ window.VENUSAPPS = Object.assign(window.VENUSAPPS || {}, (function () {
           say('  open X     launch an app: ' + Object.keys(window.VENUSOS.apps).join(' '));
           say('  view X     switch the desktop: view surface | view space');
           say('  saver      start the screensaver now');
+          say('  crt        toggle CRT mode · sound — toggle OS sounds');
           say('  vesper     summon / dismiss the mascot');
           say('  seed       reseed the wallpaper terrain');
           say('  credits    where every visual cue came from');
@@ -314,6 +316,18 @@ window.VENUSAPPS = Object.assign(window.VENUSAPPS || {}, (function () {
           if (window.VENUSSAVER) { say('  dimming the lights…'); window.VENUSSAVER.start(); }
           else say('<span class="e">  no screensaver module loaded</span>');
         },
+        crt: function () {
+          if (!window.VENUSFX) return say('<span class="e">  no fx module</span>');
+          window.VENUSFX.setCrt(!window.VENUSFX.crtOn());
+          say('  CRT ' + (window.VENUSFX.crtOn() ? 'ON. enjoy the phosphor.' : 'OFF.'));
+        },
+        sound: function () {
+          if (!window.VENUSFX) return say('<span class="e">  no fx module</span>');
+          window.VENUSFX.setSound(!window.VENUSFX.soundOn());
+          say('  sounds ' + (window.VENUSFX.soundOn() ? 'ON' : 'OFF'));
+        },
+        gsod: function () { if (window.VENUSFX) window.VENUSFX.gsod('MANUAL_HALT_REQUESTED'); },
+        rm: function () { if (window.VENUSFX) window.VENUSFX.gsod('ATTEMPTED_DELETION_OF_GOLD'); },
         vesper: function () {
           if (window.VESPER) { window.VESPER.toggle(); say('  VESPER acknowledged.'); }
           else say('<span class="e">  no mascot module loaded</span>');
@@ -338,6 +352,7 @@ window.VENUSAPPS = Object.assign(window.VENUSAPPS || {}, (function () {
         inp.value = '';
         if (!raw) return;
         say('<span class="u">V:\\&gt; ' + raw.replace(/</g, '&lt;') + '</span>');
+        if (window.VENUSACH) window.VENUSACH.unlock('terminal');
         var bits = raw.split(/\s+/);
         var fn = CMDS[bits[0].toLowerCase()];
         if (fn) fn(bits[1]);

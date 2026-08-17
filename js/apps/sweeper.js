@@ -132,6 +132,7 @@
 
       function win() {
         won = true; face.textContent = '★';
+        if (window.VENUSACH) window.VENUSACH.unlock('sweep');
         var t = (Date.now() - t0) / 1000;
         if (!best || t < best) {
           best = t;

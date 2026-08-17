@@ -338,6 +338,73 @@ body.wm-drag iframe, body.wm-drag canvas { pointer-events: none; }
 #startmenu .sep { height: 2px; margin: 4px 6px; background: var(--bevel-sh); border-bottom: 1px solid var(--bevel-hi); }
 
 /* =============================================================================
+ * DELIGHT LAYER — window animations, CRT mode, achievement toasts, GSOD
+ * ===========================================================================*/
+.win.opening { animation: winin .12s ease-out; }
+@keyframes winin { from { transform: scale(.94); opacity: .4; } to { transform: none; opacity: 1; } }
+.win.minimizing { transform: translateY(48px) scale(.92); opacity: 0; transition: transform .13s ease-in, opacity .13s ease-in; }
+.win.closing { transform: scale(.94); opacity: 0; transition: transform .1s ease-in, opacity .1s ease-in; }
+
+/* CRT: scanlines + vignette overlay, subtle phosphor bloom on the page */
+#crtfx {
+  position: fixed; inset: 0; z-index: 9300; pointer-events: none;
+  background:
+    repeating-linear-gradient(180deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 100% at 50% 50%, transparent 62%, rgba(0,0,0,.42));
+  mix-blend-mode: multiply;
+}
+body.crt { animation: crtflick 4s steps(60) infinite; }
+body.crt #desktop, body.crt .win { filter: saturate(1.12) contrast(1.05); }
+@keyframes crtflick { 0%,94%,100% { opacity: 1; } 96% { opacity: .965; } 98% { opacity: .985; } }
+@media (prefers-reduced-motion: reduce) { body.crt { animation: none; } }
+
+/* achievement toasts */
+#achtoasts {
+  position: fixed; right: 10px; bottom: calc(var(--taskbar-h) + 10px);
+  z-index: 9200; display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+.achtoast {
+  display: flex; gap: 10px; align-items: center; max-width: 300px;
+  padding: 9px 12px; transform: translateX(120%); transition: transform .28s ease-out;
+  background: var(--panel); color: var(--text);
+  border: 2px solid; border-color: var(--bevel-hi) var(--bevel-sh) var(--bevel-sh) var(--bevel-hi);
+  box-shadow: 3px 3px 0 rgba(0,0,0,.5), 0 0 24px rgba(255,200,61,.25);
+  font-size: 11px; line-height: 1.45;
+}
+.achtoast.on { transform: none; }
+.achtoast b { color: var(--gold); font-size: 10px; letter-spacing: .1em; }
+.achtoast .a-i { font-size: 22px; flex: none; }
+
+/* trophy shelf */
+.ach-grid { display: grid; gap: 8px; }
+.ach-row {
+  display: flex; gap: 12px; align-items: center; padding: 9px 12px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-card);
+  opacity: .45; font-size: 12px; line-height: 1.4;
+}
+.ach-row.owned { opacity: 1; border-color: var(--gold-deep); }
+.ach-row .a-i { font-size: 22px; width: 30px; text-align: center; flex: none; }
+.ach-row b { color: var(--gold); font-size: 11px; letter-spacing: .08em; }
+.ach-row i { color: var(--dim); font-style: normal; font-size: 11px; }
+
+/* the Gold Screen of Death */
+#gsod {
+  position: fixed; inset: 0; z-index: 9600; cursor: pointer;
+  background: var(--gold); color: var(--ink);
+  font-family: var(--mono); font-size: 14px; line-height: 1.7;
+  display: grid; place-items: center; padding: 24px;
+}
+#gsod .g-wrap { max-width: 62ch; }
+#gsod p { margin: 0 0 14px; }
+#gsod .g-badge {
+  display: inline-block; background: var(--ink); color: var(--gold);
+  font-weight: 900; padding: 3px 14px; letter-spacing: .2em; margin-bottom: 18px;
+}
+#gsod .g-code { font-weight: 700; }
+#gsod .g-blink { animation: gblink 1s steps(2) infinite; }
+@keyframes gblink { 50% { opacity: .25; } }
+
+/* =============================================================================
  * MOBILE — a 9x desktop is a lie on a phone. Windows go full-bleed and stack;
  * drag/resize is dropped rather than faked.
  * ===========================================================================*/

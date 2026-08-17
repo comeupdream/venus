@@ -66,6 +66,9 @@
       '<i class="rz w" data-d="w"></i><i class="rz sw" data-d="sw"></i>';
 
     desktop.appendChild(node);
+    node.classList.add('opening');
+    setTimeout(function () { node.classList.remove('opening'); }, 140);
+    if (window.VENUSFX) window.VENUSFX.sound('open');
     var body = node.querySelector('.wbody');
     var teardown = null;
     try { teardown = cfg.mount(body); } catch (err) {
@@ -113,7 +116,10 @@
     var o = wins[key];
     if (!o) return;
     if (typeof o.teardown === 'function') { try { o.teardown(); } catch (e) { /* nothing to undo */ } }
-    o.node.remove();
+    if (window.VENUSFX) window.VENUSFX.sound('close');
+    var gone = o.node;
+    gone.classList.add('closing');
+    setTimeout(function () { gone.remove(); }, 110);
     delete wins[key];
     document.querySelectorAll('#tasks .task').forEach(function (t) { if (t.dataset.k === key) t.remove(); });
     var rest = Object.keys(wins);
@@ -124,7 +130,16 @@
     var o = wins[key];
     if (!o) return;
     o.min = !o.min;
-    o.node.style.display = o.min ? 'none' : 'flex';
+    if (o.min) {
+      if (window.VENUSFX) window.VENUSFX.sound('min');
+      o.node.classList.add('minimizing');
+      setTimeout(function () {
+        if (o.min) o.node.style.display = 'none';
+        o.node.classList.remove('minimizing');
+      }, 130);
+    } else {
+      o.node.style.display = 'flex';
+    }
     if (!o.min) focusWin(key);
     else document.querySelectorAll('#tasks .task').forEach(function (t) {
       if (t.dataset.k === key) t.classList.remove('active');
@@ -273,6 +288,25 @@
     items.appendChild(m);
   });
   items.appendChild(el('div', 'sep'));
+
+  /* delight toggles live under the apps */
+  if (window.VENUSFX) {
+    var snd = el('button', 'mi');
+    var crt = el('button', 'mi');
+    function labels() {
+      snd.innerHTML = '<span class="mi-i" aria-hidden="true">♪</span><span>Sounds: ' +
+        (window.VENUSFX.soundOn() ? 'ON' : 'OFF') + '</span>';
+      crt.innerHTML = '<span class="mi-i" aria-hidden="true">▤</span><span>CRT Mode: ' +
+        (window.VENUSFX.crtOn() ? 'ON' : 'OFF') + '</span>';
+    }
+    snd.addEventListener('click', function () { window.VENUSFX.setSound(!window.VENUSFX.soundOn()); labels(); });
+    crt.addEventListener('click', function () { window.VENUSFX.setCrt(!window.VENUSFX.crtOn()); labels(); });
+    labels();
+    items.appendChild(snd);
+    items.appendChild(crt);
+    items.appendChild(el('div', 'sep'));
+  }
+
   var shut = el('button', 'mi');
   shut.innerHTML = '<span class="mi-i" aria-hidden="true">⏻</span><span>Shut Down…</span>';
   shut.addEventListener('click', function () { closeStart(); shutDown(); });
@@ -382,6 +416,8 @@
     if (booted) return;
     booted = true;
     try { localStorage.setItem('venus-booted', '1'); } catch (e) { /* private mode */ }
+    if (window.VENUSFX) window.VENUSFX.sound('chime');
+    if (window.VENUSACH) window.VENUSACH.unlock('boot');
     clearInterval(barIv);
     bootEl.style.transition = 'opacity .5s';
     bootEl.style.opacity = '0';

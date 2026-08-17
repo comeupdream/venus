@@ -35,6 +35,7 @@
       b.textContent = '✓ COPIED';
       setTimeout(function () { b.textContent = 'COPY'; }, 1400);
     };
+    if (window.VENUSACH) window.VENUSACH.unlock('ca_copy');
     if (navigator.clipboard) navigator.clipboard.writeText(C.ca).then(done, function () {});
     else { /* pre-clipboard-API fallback */
       var t = document.createElement('textarea');

@@ -121,6 +121,7 @@
         state = 'dead';
         var km = dist / 100;
         f.stat.textContent = 'LOST IN THE DECK AT ' + km.toFixed(1) + ' KM — ' + why;
+        if (km >= 5 && window.VENUSACH) window.VENUSACH.unlock('rider5');
         if (km > best) { best = km; try { localStorage.setItem('venus-rider-best', String(km)); } catch (e) {} showBest(); }
       }
 

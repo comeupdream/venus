@@ -169,6 +169,26 @@ window.VENUSICONS = (function () {
       '<path d="M28 7.5L14.3 18" stroke="' + D + '" stroke-width="1.3"/>' +
       '<path d="M3 25.5c3-2.2 5 2.2 8 0M5 29c3-2.2 5 2.2 8 0" stroke="' + S + '" stroke-width="1.6" fill="none" stroke-linecap="round"/>'),
 
+    /* the flagship: VESPER mid-jump over a coin */
+    supervesper: svg(
+      '<rect x="6" y="7" width="13" height="11" rx="2" fill="' + G + '" stroke="' + K + '"/>' +
+      '<rect x="9" y="10" width="5" height="4" rx="1" fill="' + H + '"/>' +
+      '<path d="M12.5 7V3.5" stroke="' + E + '" stroke-width="1.8"/><circle cx="12.5" cy="2.8" r="1.4" fill="' + E + '"/>' +
+      '<path d="M7 18l-2.5 4M18 18l2.5 4" stroke="' + D + '" stroke-width="2" stroke-linecap="round"/>' +
+      '<path d="M2 12h2.5M1 15h3" stroke="' + S + '" stroke-width="1.6" stroke-linecap="round"/>' +
+      '<circle cx="25" cy="24" r="4.6" fill="' + G + '" stroke="' + D + '" stroke-width="1.4"/>' +
+      '<path d="M23.4 22l1.6 4 1.6-4" stroke="' + K + '" stroke-width="1.4" fill="none" stroke-linecap="round"/>'),
+
+    /* the orrery */
+    orbits: svg(
+      '<circle cx="16" cy="16" r="3.4" fill="' + G + '"/>' +
+      '<circle cx="16" cy="16" r="6.5" fill="none" stroke="' + D + '" stroke-width="1.1"/>' +
+      '<circle cx="16" cy="16" r="9.8" fill="none" stroke="' + D + '" stroke-width="1.1"/>' +
+      '<circle cx="16" cy="16" r="13.2" fill="none" stroke="' + D + '" stroke-width="1.1"/>' +
+      '<circle cx="21.5" cy="12.5" r="1.5" fill="' + C + '"/>' +
+      '<circle cx="8.5" cy="10.5" r="2.1" fill="' + G + '" stroke="' + K + '" stroke-width=".8"/>' +
+      '<circle cx="24" cy="24.5" r="1.9" fill="' + EARTH + '" stroke="' + K + '" stroke-width=".8"/>'),
+
     /* the manual */
     info: svg(
       '<circle cx="16" cy="16" r="12.5" fill="' + N + '" stroke="' + G + '" stroke-width="2"/>' +

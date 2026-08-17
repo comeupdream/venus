@@ -23,6 +23,8 @@
 <meta name="twitter:image" content="https://venus7777.online/assets/social-card.png">
 
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/os.css">
 <link rel="stylesheet" href="css/apps.css">
@@ -62,6 +64,7 @@
   <div id="tasks" role="list"></div>
   <button id="viewtoggle" title="Toggle surface / space view" aria-pressed="false">▲ SURFACE</button>
   <div id="tray">
+    <span id="traygold" style="color:var(--sulfur)"></span>
     <span id="trayprice"></span>
     <span class="phase" id="trayphase">☾ —</span>
     <span class="clock" id="clock">--:--</span>
@@ -91,6 +94,8 @@
 <script src="js/terrain.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/coin.js"></script>
+<script src="js/cabar.js"></script>
+<script src="js/share.js"></script>
 <script src="js/apps.js"></script>
 <!-- js/apps/*.js register themselves into VENUSAPPS here, before os.js reads it -->
 <script src="js/apps/info.js"></script>
@@ -109,6 +114,12 @@
 <script src="js/apps/amp.js"></script>
 <script src="js/apps/vtime.js"></script>
 <script src="js/apps/defrag.js"></script>
+<script src="js/apps/gold.js"></script>
+<script>
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    addEventListener('load', function () { navigator.serviceWorker.register('sw.js'); });
+  }
+</script>
 <script src="js/screensaver.js"></script>
 <script src="js/vesper.js"></script>
 <script src="js/os.js"></script>

@@ -50,7 +50,9 @@
             '<label>FUEL</label><span class="readout" data-f="fuel" style="min-width:52px;text-align:left">100</span>' +
           '</div>' +
           '<div class="app-foot"><span>SOL SEED ' + seedStr + ' — EVERYONE MAPS THIS PLANET TODAY</span>' +
-            '<span class="spacer"></span><span data-f="best">—</span></div>' +
+            '<span class="spacer"></span>' +
+            '<button class="ghost" data-a="share" style="padding:2px 8px;font-size:10px">SHARE CARD</button>' +
+            '<span data-f="best">—</span></div>' +
         '</div>'
       ));
 
@@ -203,6 +205,15 @@
         }
       });
 
+      node.querySelector('[data-a="share"]').addEventListener('click', function () {
+        var pct = Math.min(100, mapped / (MW * MH) * 100);
+        var found = ANOMALIES.filter(function (a) { return a.found; }).length;
+        window.VENUSSHARE.card({
+          app: 'MAGELLAN.EXE · VENUS-OS', headline: pct.toFixed(1) + '% MAPPED', file: 'magellan-' + seedStr,
+          lines: ['SOL SEED ' + seedStr + ' — SAME PLANET FOR EVERYONE TODAY',
+                  found + '/3 ANOMALIES LOGGED', 'BEAT IT.']
+        });
+      });
       return stop;
     }
   };

@@ -41,6 +41,14 @@
             'The exact rate and cadence belong to the tokenomics sheet:</p>' +
             '<span class="placeholder"><b>EMISSION RATE / CADENCE</b>— (published when final)</span>' +
 
+            '<p style="display:flex;gap:8px;flex-wrap:wrap">' +
+              '<a class="genbtn" style="text-decoration:none;padding:8px 14px;border-radius:8px" ' +
+                'href="' + C.buyUrl + '" target="_blank" rel="noopener">BUY ON PANCAKESWAP ▸</a>' +
+              '<a class="ghost" style="text-decoration:none;padding:8px 14px;border-radius:8px;border:1px solid var(--line);color:var(--text)" ' +
+                'href="' + C.chartUrl + '" target="_blank" rel="noopener">CHART</a>' +
+              '<a class="ghost" style="text-decoration:none;padding:8px 14px;border-radius:8px;border:1px solid var(--line);color:var(--text)" ' +
+                'href="' + C.holdersUrl + '" target="_blank" rel="noopener">HOLDERS ON BSCSCAN</a>' +
+            '</p>' +
             '<h2>How do I buy?</h2>' +
             '<p>Any BNB Smart Chain DEX. Paste the contract address above — never trust a ' +
             'ticker search alone; tickers can be squatted, the CA cannot. Live pair data is in the ' +

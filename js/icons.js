@@ -196,6 +196,15 @@ window.VENUSICONS = (function () {
       '<path d="M13 14.5h3.6V22" stroke="' + G + '" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
       '<path d="M12.5 22.5h7" stroke="' + G + '" stroke-width="2.6" stroke-linecap="round"/>'),
 
+    /* stacked ingots — the payout tracker */
+    gold: svg(
+      '<g stroke="' + K + '" stroke-width="1">' +
+      '<path d="M6 25h9l2.5 5H3.5Z" fill="' + G + '"/><path d="M6 25l2-3h5l2 3Z" fill="' + H + '"/>' +
+      '<path d="M17.5 25h9l2.5 5h-14Z" fill="' + G + '"/><path d="M17.5 25l2-3h5l2 3Z" fill="' + H + '"/>' +
+      '<path d="M11.5 18h9l2.5 5h-14Z" fill="' + G + '"/><path d="M11.5 18l2-3h5l2 3Z" fill="' + H + '"/></g>' +
+      '<path d="M23 5l1.2 2.6L27 8.8l-2.8 1.2L23 12.6l-1.2-2.6L19 8.8l2.8-1.2Z" fill="' + S + '"/>' +
+      '<circle cx="8" cy="9" r="1.2" fill="' + C + '"/>'),
+
     /* gold bar with a heartbeat — the RWA feed */
     market: svg(
       '<path d="M8 18h16l3 8H5Z" fill="' + G + '" stroke="' + K + '"/>' +

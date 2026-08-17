@@ -319,7 +319,7 @@
       var ph = window.VENUSPHASE.venusPhase(d);
       $('#trayphase').textContent = '☾ ' + (ph.illumination * 100).toFixed(1) + '% · ' + ph.name;
     }
-    /* live price chip, only when the feed has a pair */
+    /* live price chips, only when the feed has pairs */
     if (window.VENUSMARKET) {
       var m = window.VENUSMARKET.get();
       var el2 = $('#trayprice');
@@ -329,6 +329,11 @@
           (chg == null ? '' : ' ' + (chg >= 0 ? '▲' : '▼'));
         el2.style.color = chg == null || chg >= 0 ? 'var(--gold)' : 'var(--ember)';
       } else if (el2) el2.textContent = '';
+      /* the thesis, restated on every screen: live gold */
+      var el3 = $('#traygold');
+      if (m.gold && m.gold.priceUsd && el3) {
+        el3.textContent = 'AU $' + Math.round(+m.gold.priceUsd).toLocaleString() + '/oz';
+      } else if (el3) el3.textContent = '';
     }
   }
   tickTray();
@@ -356,6 +361,10 @@
   var bootEl = $('#boot'), pre = $('#bootpre'), bar = $('#bootbar');
   var li = 0, ci = 0, barIv = null;
 
+  /* returning visitors get the express boot — charm once, speed forever */
+  var returning = false;
+  try { returning = !!localStorage.getItem('venus-booted'); } catch (e) {}
+
   function type() {
     if (li >= LINES.length) return;
     var line = LINES[li];
@@ -372,6 +381,7 @@
   function enterDesktop() {
     if (booted) return;
     booted = true;
+    try { localStorage.setItem('venus-booted', '1'); } catch (e) { /* private mode */ }
     clearInterval(barIv);
     bootEl.style.transition = 'opacity .5s';
     bootEl.style.opacity = '0';
@@ -387,13 +397,14 @@
 
   var pct = 0;
   barIv = setInterval(function () {
-    pct = Math.min(100, pct + 2.6);
+    pct = Math.min(100, pct + (returning ? 12 : 2.6));
     if (bar) bar.style.width = pct + '%';
     if (pct >= 100) skipBoot();
   }, 62);
 
   bootEl.addEventListener('click', skipBoot);
-  type();
+  if (returning) pre.textContent = LINES.join('\n');   /* no typing replay */
+  else type();
 
   /* the wallpaper starts immediately — it is visible behind the boot screen */
   if (window.TERRAIN) {

@@ -93,11 +93,46 @@ body {
 #bootos .skip { font-family: var(--mono); font-size: 10px; color: var(--faint); letter-spacing: .2em; }
 
 /* =============================================================================
+ * CA BAR — the conversion strip. Sits above the desktop at all times.
+ * ===========================================================================*/
+:root { --cabar-h: 32px; }
+#cabar {
+  position: fixed; left: 0; right: 0; top: 0; z-index: 550;
+  height: var(--cabar-h); display: flex; align-items: center; gap: 7px;
+  padding: 0 8px;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border-bottom: 2px solid var(--gold-deep);
+}
+#cabar .cb-brand { color: var(--gold); font-size: 15px; flex: none; }
+#cabar .cb-flex { flex: 1; }
+#cabar .cb-ca {
+  display: flex; align-items: center; gap: 8px; height: 22px; padding: 0 9px;
+  cursor: pointer; font-family: var(--mono); font-size: 11px; color: var(--text);
+  background: var(--sunken);
+  border: 2px solid; border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh);
+}
+#cabar .cb-copy { font-size: 9px; letter-spacing: .14em; color: var(--sulfur); }
+#cabar .cb-btn {
+  flex: none; display: grid; place-items: center; height: 22px; padding: 0 10px;
+  font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .12em;
+  color: var(--text); text-decoration: none; background: var(--panel-2);
+  border: 2px solid; border-color: var(--bevel-hi) var(--bevel-sh) var(--bevel-sh) var(--bevel-hi);
+}
+#cabar .cb-btn:hover { color: var(--gold); }
+#cabar .cb-btn:active { border-color: var(--bevel-sh) var(--bevel-hi) var(--bevel-hi) var(--bevel-sh); }
+#cabar .cb-buy { background: linear-gradient(180deg, var(--gold), var(--gold-deep)); color: var(--ink); }
+#cabar .cb-buy:hover { color: var(--ink); filter: brightness(1.1); }
+@media (max-width: 560px) {
+  #cabar .cb-scan { display: none; }
+  #cabar { gap: 5px; }
+}
+
+/* =============================================================================
  * DESKTOP — retro.css used venetian sunset bands for the orca poster.
  * Here the same device draws Venus's banded cloud deck, drifting.
  * ===========================================================================*/
 #desktop {
-  position: fixed; inset: 0 0 var(--taskbar-h) 0; overflow: hidden;
+  position: fixed; inset: var(--cabar-h) 0 var(--taskbar-h) 0; overflow: hidden;
   background: var(--void);
 }
 #wallpaper { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }

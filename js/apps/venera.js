@@ -32,8 +32,10 @@
             '<span class="readout" data-f="vel">VEL 0 M/S</span>' +
             '<span class="readout" data-f="temp" style="min-width:90px">HULL 20°C</span>' +
           '</div>' +
-          '<div class="app-foot"><span>VENERA-13 SURVIVED 127 MIN ON THE SURFACE. YOU WILL NOT.</span>' +
-            '<span class="spacer"></span><span data-f="best">—</span></div>' +
+          '<div class="app-foot"><span>VENERA-13 SURVIVED 127 MIN. YOU WILL NOT.</span>' +
+            '<span class="spacer"></span>' +
+            '<button class="ghost" data-a="share" style="padding:2px 8px;font-size:10px">SHARE CARD</button>' +
+            '<span data-f="best">—</span></div>' +
         '</div>'
       ));
 
@@ -203,6 +205,16 @@
         return 'rgb(' + r + ',' + g2 + ',' + bl + ')';
       }
 
+      node.querySelector('[data-a="share"]').addEventListener('click', function () {
+        var headline = st === 'surface' || st === 'done'
+          ? 'SURVIVED ' + surfT.toFixed(0) + ' SECONDS'
+          : st === 'dead' ? 'LOST AT ' + (alt / 1000).toFixed(1) + ' KM' : 'DESCENT PENDING';
+        window.VENUSSHARE.card({
+          app: 'VENERA.EXE · VENUS-OS', headline: headline, file: 'venera-run',
+          lines: ['SCORE ' + Math.round(score + surfT), 'SURFACE: 462°C · 92 BAR',
+                  'VENERA-13 DID 127 MIN. RESPECT.']
+        });
+      });
       return stop;
     }
   };

@@ -33,6 +33,7 @@
           '<div class="stage"><canvas tabindex="0"></canvas>' +
             '<div class="hint">HOLD POINTER / SPACE — LIFT · 48 KM = HEAT · 70 KM = STALL</div></div>' +
           '<div class="app-foot"><span>DECK OF ' + seedStr + '</span><span class="spacer"></span>' +
+            '<button class="ghost" data-a="share" style="padding:2px 8px;font-size:10px">SHARE CARD</button>' +
             '<span data-f="dist">0.0 KM</span><span data-f="best">—</span></div>' +
         '</div>'
       ));
@@ -202,6 +203,15 @@
         }
       }
 
+      node.querySelector('[data-a="share"]').addEventListener('click', function () {
+        window.VENUSSHARE.card({
+          app: 'CLOUD RIDER · VENUS-OS', headline: (dist / 100).toFixed(1) + ' KM IN THE DECK',
+          file: 'rider-' + seedStr,
+          lines: ['DECK OF ' + seedStr + ' — SAME SKY FOR EVERYONE TODAY',
+                  'BEST ' + Math.max(best, dist / 100).toFixed(1) + ' KM',
+                  '360 KM/H TAILWIND. ONE BUTTON. GOOD LUCK.']
+        });
+      });
       return stop;
     }
   };
